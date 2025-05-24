@@ -59,6 +59,7 @@ if ANTHROPIC_API_KEY:
     
     try:
         print("🔌 Initializing Claude client...")
+        import anthropic
         client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
         print("✅ Claude client initialized successfully!")
         
@@ -75,6 +76,10 @@ if ANTHROPIC_API_KEY:
         else:
             print("⚠️ Claude API test returned empty response")
             
+    except ImportError as e:
+        print(f"❌ Import Error: Could not import anthropic library: {e}")
+        print("📦 Try running: pip install --upgrade anthropic")
+        client = None
     except anthropic.AuthenticationError as e:
         print(f"❌ Authentication Error: {e}")
         print("🔑 Please check your ANTHROPIC_API_KEY in the .env file")
@@ -103,9 +108,15 @@ print("=" * 60)
 print(f"🎯 Final Status: {'✅ READY' if client else '❌ FALLBACK MODE'}")
 print("=" * 60)
 
-with app.app_context():
-    db.create_all()
-    print("✅ Database tables created successfully!")
+# Initialize Flask app and database
+print("🗄️ Initializing database...")
+try:
+    with app.app_context():
+        db.create_all()
+        print("✅ Database tables created successfully!")
+except Exception as e:
+    print(f"❌ Database initialization error: {e}")
+    print("🔧 Continuing with existing database...")
 
 def generate_llm_content(prompt_text, model="claude-3-haiku-20240307", max_tokens=1500):
     """Generate content using Claude API with enhanced error handling and debugging"""
@@ -208,6 +219,19 @@ def get_fallback_content(prompt_text):
     print("🔄 Using intelligent fallback content")
     
     prompt_lower = prompt_text.lower()
+    
+    # Check if this is a question generation request
+    if "generate" in prompt_lower and "multiple-choice questions" in prompt_lower:
+        # Extract topic from the prompt
+        topic = "general knowledge"
+        if "about" in prompt_lower:
+            topic_start = prompt_lower.find("about") + 5
+            topic_end = prompt_lower.find(".", topic_start)
+            if topic_end == -1:
+                topic_end = len(prompt_lower)
+            topic = prompt_lower[topic_start:topic_end].strip()
+        
+        return generate_fallback_questions(topic)
     
     if any(keyword in prompt_lower for keyword in ['salary', 'compensation', 'pay', 'money']):
         return """## 💰 Salary & Compensation Guidance
@@ -404,6 +428,195 @@ I'm here to help with your career development! While I'm currently running in of
 - "What's the best way to network in the tech industry?"
 
 *What would you like to explore first?*"""
+
+def generate_fallback_questions(topic):
+    """Generate fallback assessment questions when Claude API is unavailable"""
+    print(f"🔄 Generating fallback questions for: {topic}")
+    
+    # Create topic-specific question templates
+    question_templates = {
+        'machine learning': [
+            {
+                'question': 'What is the primary goal of supervised learning?',
+                'options': {
+                    'A': 'To find patterns in unlabeled data',
+                    'B': 'To predict outcomes based on labeled training data',
+                    'C': 'To reduce the dimensionality of data',
+                    'D': 'To cluster similar data points'
+                },
+                'correct_answer': 'B'
+            },
+            {
+                'question': 'Which algorithm is commonly used for classification tasks?',
+                'options': {
+                    'A': 'K-means clustering',
+                    'B': 'Principal Component Analysis',
+                    'C': 'Random Forest',
+                    'D': 'DBSCAN'
+                },
+                'correct_answer': 'C'
+            },
+            {
+                'question': 'What does overfitting in machine learning mean?',
+                'options': {
+                    'A': 'Model performs well on training data but poorly on new data',
+                    'B': 'Model performs poorly on both training and test data',
+                    'C': 'Model takes too long to train',
+                    'D': 'Model uses too many features'
+                },
+                'correct_answer': 'A'
+            },
+            {
+                'question': 'Which metric is used to evaluate classification models?',
+                'options': {
+                    'A': 'Mean Squared Error',
+                    'B': 'R-squared',
+                    'C': 'Accuracy',
+                    'D': 'Root Mean Square Error'
+                },
+                'correct_answer': 'C'
+            },
+            {
+                'question': 'What is the purpose of cross-validation?',
+                'options': {
+                    'A': 'To increase model complexity',
+                    'B': 'To assess model performance and generalization',
+                    'C': 'To reduce training time',
+                    'D': 'To visualize data distribution'
+                },
+                'correct_answer': 'B'
+            }
+        ],
+        'python': [
+            {
+                'question': 'Which data type is mutable in Python?',
+                'options': {
+                    'A': 'tuple',
+                    'B': 'string',
+                    'C': 'list',
+                    'D': 'int'
+                },
+                'correct_answer': 'C'
+            },
+            {
+                'question': 'What does the len() function return?',
+                'options': {
+                    'A': 'The number of characters or elements',
+                    'B': 'The memory size of an object',
+                    'C': 'The data type of an object',
+                    'D': 'The last element of a sequence'
+                },
+                'correct_answer': 'A'
+            },
+            {
+                'question': 'How do you create a dictionary in Python?',
+                'options': {
+                    'A': 'dict = []',
+                    'B': 'dict = ()',
+                    'C': 'dict = {}',
+                    'D': 'dict = ""'
+                },
+                'correct_answer': 'C'
+            },
+            {
+                'question': 'What is the output of print(3 // 2)?',
+                'options': {
+                    'A': '1.5',
+                    'B': '1',
+                    'C': '2',
+                    'D': 'Error'
+                },
+                'correct_answer': 'B'
+            },
+            {
+                'question': 'Which keyword is used to define a function in Python?',
+                'options': {
+                    'A': 'function',
+                    'B': 'def',
+                    'C': 'func',
+                    'D': 'define'
+                },
+                'correct_answer': 'B'
+            }
+        ]
+    }
+    
+    # Default general questions for unknown topics
+    default_questions = [
+        {
+            'question': f'What is a fundamental concept in {topic}?',
+            'options': {
+                'A': 'Basic principles and foundations',
+                'B': 'Advanced theoretical frameworks',
+                'C': 'Practical implementation details',
+                'D': 'Historical development'
+            },
+            'correct_answer': 'A'
+        },
+        {
+            'question': f'Which skill is most important when learning {topic}?',
+            'options': {
+                'A': 'Memorization of facts',
+                'B': 'Understanding core concepts',
+                'C': 'Speed of execution',
+                'D': 'Knowing all tools'
+            },
+            'correct_answer': 'B'
+        },
+        {
+            'question': f'What is the best approach to master {topic}?',
+            'options': {
+                'A': 'Reading textbooks only',
+                'B': 'Practice and hands-on experience',
+                'C': 'Watching videos passively',
+                'D': 'Avoiding difficult concepts'
+            },
+            'correct_answer': 'B'
+        },
+        {
+            'question': f'How can you stay updated with {topic} trends?',
+            'options': {
+                'A': 'Ignore new developments',
+                'B': 'Follow industry news and publications',
+                'C': 'Stick to old methods only',
+                'D': 'Avoid learning new techniques'
+            },
+            'correct_answer': 'B'
+        },
+        {
+            'question': f'What indicates proficiency in {topic}?',
+            'options': {
+                'A': 'Ability to explain concepts clearly',
+                'B': 'Knowing all possible details',
+                'C': 'Working very quickly',
+                'D': 'Using complex terminology'
+            },
+            'correct_answer': 'A'
+        }
+    ]
+    
+    # Get appropriate questions based on topic
+    topic_lower = topic.lower()
+    if 'machine learning' in topic_lower or 'ml' in topic_lower:
+        base_questions = question_templates['machine learning']
+    elif 'python' in topic_lower:
+        base_questions = question_templates['python']
+    else:
+        base_questions = default_questions
+    
+    # Create formatted questions string
+    questions_text = ""
+    for i, q in enumerate(base_questions[:5], 1):  # Limit to 5 questions for fallback
+        questions_text += f"""Question {i}: {q['question']}
+A) {q['options']['A']}
+B) {q['options']['B']}
+C) {q['options']['C']}
+D) {q['options']['D']}
+Correct Answer: {q['correct_answer']}
+
+"""
+    
+    return questions_text
 
 @app.route('/auth/login', methods=['GET', 'POST'])
 def auth_login():
@@ -941,7 +1154,7 @@ def validate_session(session_id):
     return True, session_data
 
 def generate_questions(topic):
-    """Generate assessment questions using Claude"""
+    """Generate assessment questions using Claude or fallback"""
     prompt = f"""Generate 25 multiple-choice questions about {topic}. 
 Format each question exactly as:
 
@@ -955,10 +1168,45 @@ Correct Answer: [A, B, C, or D]
 Make questions progressively challenging covering fundamentals, intermediate concepts, and advanced topics."""
     
     try:
+        print(f"🎯 Attempting to generate questions for: {topic}")
         response = generate_llm_content(prompt, max_tokens=3000)
-        return parse_questions(response)
+        
+        if response and len(response) > 100:  # Basic check for substantial content
+            print("✅ Got response from LLM, parsing questions...")
+            questions = parse_questions(response)
+            
+            if questions and len(questions) >= 3:  # Need at least 3 questions
+                print(f"✅ Successfully parsed {len(questions)} questions")
+                return questions
+            else:
+                print("⚠️ Failed to parse questions from LLM response, using fallback")
+        else:
+            print("⚠️ LLM response too short or empty, using fallback")
+        
+        # If we get here, the LLM response wasn't good enough
+        print("🔄 Generating fallback questions...")
+        fallback_response = generate_fallback_questions(topic)
+        questions = parse_questions(fallback_response)
+        
+        if questions:
+            print(f"✅ Generated {len(questions)} fallback questions")
+            return questions
+        else:
+            print("❌ Even fallback question generation failed")
+            return []
+            
     except Exception as e:
-        print(f"Error generating questions: {e}")
+        print(f"❌ Error in generate_questions: {e}")
+        print("🔄 Attempting fallback question generation...")
+        try:
+            fallback_response = generate_fallback_questions(topic)
+            questions = parse_questions(fallback_response)
+            if questions:
+                print(f"✅ Fallback generated {len(questions)} questions")
+                return questions
+        except Exception as fallback_error:
+            print(f"❌ Fallback also failed: {fallback_error}")
+        
         return []
 
 def parse_questions(questions_text):
