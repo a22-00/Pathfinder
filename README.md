@@ -11,7 +11,7 @@
 ## 🚀 Quick Start
 
 ```bash
-python quick_start.py
+python start_production.py
 ```
 
 ## Manual Setup
@@ -30,7 +30,7 @@ echo "ANTHROPIC_API_KEY=your_key" > .env
 
 3. **Run**
 ```bash
-python start_app.py
+python start_production.py
 ```
 
 ## Test
@@ -44,6 +44,6 @@ python test_complete_system.py
 |-------|-----|
 | API key error | Check .env file |
 | Import errors | Run pip install -r requirements.txt |
-| Port in use | Change port in job_seeker.py |
+| Port in use | Change port in gunicorn.conf.py |
 
 ---
