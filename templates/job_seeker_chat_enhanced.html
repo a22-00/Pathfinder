@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Career Coach | Pathfinder Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar-glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .chat-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .message-user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: 2rem;
+            border-radius: 20px 20px 5px 20px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        .message-ai {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            margin-right: 2rem;
+            border-radius: 20px 20px 20px 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideInLeft 0.5s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .ai-response {
+            line-height: 1.8;
+        }
+        
+        .ai-response h1, .ai-response h2, .ai-response h3 {
+            color: #93c5fd;
+            font-weight: 700;
+            margin: 1rem 0 0.5rem 0;
+        }
+        
+        .ai-response h1 { font-size: 1.5rem; }
+        .ai-response h2 { font-size: 1.3rem; }
+        .ai-response h3 { font-size: 1.1rem; }
+        
+        .ai-response strong {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+        
+        .ai-response ul, .ai-response ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .ai-response li {
+            margin: 0.3rem 0;
+        }
+        
+        .input-glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .input-glass:focus {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(102, 126, 234, 0.8);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        .trend-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .trend-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.4), rgba(118, 75, 162, 0.4));
+        }
+        
+        .action-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typingDots 1.4s ease-in-out infinite both;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typingDots {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 20px rgba(79, 172, 254, 0.5); }
+            to { box-shadow: 0 0 30px rgba(79, 172, 254, 0.8); }
+        }
+        
+        .recommendation-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(34, 197, 94, 0.2));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typingDots {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 20px rgba(79, 172, 254, 0.5); }
+            to { box-shadow: 0 0 30px rgba(79, 172, 254, 0.8); }
+        }
+        
+        .recommendation-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(34, 197, 94, 0.2));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="min-h-screen overflow-x-hidden">
+    <!-- Navigation -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="text-2xl font-bold text-white">
+                        <i class="fas fa-brain mr-2"></i>
+                        Pathfinder <span class="text-blue-300">Pro</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="/" class="text-white hover:text-blue-300 transition-colors">
+                        <i class="fas fa-home mr-1"></i> Home
+                    </a>
+                    <div class="text-white">
+                        <i class="fas fa-comments mr-1"></i> AI Career Coach
+                    </div>
+                    <a href="/assessment" class="text-white hover:text-blue-300 transition-colors">
+                        <i class="fas fa-graduation-cap mr-1"></i> Assessment
+                    </a>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                        <span class="text-white text-sm">Career Explorer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-16 min-h-screen flex">
+        <!-- Sidebar -->
+        <div class="sidebar-glass w-80 flex flex-col">
+            <!-- Hero Section -->
+            <div class="hero-section m-4 p-6 rounded-2xl slide-up">
+                <div class="text-center mb-6">
+                    <div class="inline-block p-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 mb-4">
+                        <i class="fas fa-rocket text-3xl text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">
+                        Your AI Career Assistant
+                    </h2>
+                    <p class="text-gray-200 text-sm">
+                        Get personalized guidance, trending insights, and actionable career advice
+                    </p>
+                </div>
+
+                <!-- Stats Dashboard -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="glass-dark p-3 rounded-xl text-center">
+                        <div class="text-xl font-bold text-blue-400" id="chat-count">0</div>
+                        <div class="text-xs text-gray-300">Conversations</div>
+                    </div>
+                    <div class="glass-dark p-3 rounded-xl text-center">
+                        <div class="text-xl font-bold text-green-400" id="recommendation-count">0</div>
+                        <div class="text-xs text-gray-300">Recommendations</div>
+                    </div>
+                    </div>
+                </div>
+
+            <!-- Trending Topics -->
+            <div class="mx-4 mb-4 slide-up" style="animation-delay: 0.2s;">
+                <div class="glass-card p-4 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-fire text-white text-sm"></i>
+                    </div>
+                        <h3 class="text-lg font-semibold text-white">Trending Now</h3>
+                        <i class="fas fa-chart-line ml-auto text-orange-400"></i>
+                    </div>
+                    <div id="trending-topics" class="space-y-2">
+                        <!-- Trending topics will be populated here -->
+                    </div>
+                    <button onclick="refreshTrends()" class="w-full mt-3 py-2 px-3 rounded-xl bg-gradient-to-r from-orange-400 to-red-500 text-white text-sm font-medium hover:from-orange-500 hover:to-red-600 transition-all">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh Trends
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mx-4 mb-4 slide-up" style="animation-delay: 0.4s;">
+                <div class="glass-card p-4 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-bolt text-white text-sm"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white">Quick Actions</h3>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="action-card p-3 rounded-xl" onclick="quickAction('resume')">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-alt text-blue-400 mr-3"></i>
+                            <div>
+                                    <div class="text-white font-medium text-sm">Resume Review</div>
+                                    <div class="text-gray-300 text-xs">Get AI feedback</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="action-card p-3 rounded-xl" onclick="quickAction('interview')">
+                            <div class="flex items-center">
+                                <i class="fas fa-microphone text-green-400 mr-3"></i>
+                                <div>
+                                    <div class="text-white font-medium text-sm">Interview Prep</div>
+                                    <div class="text-gray-300 text-xs">Practice questions</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="action-card p-3 rounded-xl" onclick="quickAction('salary')">
+                            <div class="flex items-center">
+                                <i class="fas fa-dollar-sign text-yellow-400 mr-3"></i>
+                                <div>
+                                    <div class="text-white font-medium text-sm">Salary Guide</div>
+                                    <div class="text-gray-300 text-xs">Market rates</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="/assessment" class="action-card p-3 rounded-xl block" onclick="quickAction('skills')">
+                            <div class="flex items-center">
+                                <i class="fas fa-brain text-purple-400 mr-3"></i>
+                                <div>
+                                    <div class="text-white font-medium text-sm">Skills Assessment</div>
+                                    <div class="text-gray-300 text-xs">Test your knowledge</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="mx-4 mb-4 flex-grow slide-up" style="animation-delay: 0.6s;">
+                <div class="glass-card p-4 rounded-2xl h-full">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-lightbulb text-white text-sm"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white">Smart Recommendations</h3>
+                    </div>
+                    <div id="recommendations" class="space-y-2 max-h-64 overflow-y-auto">
+                        <!-- Recommendations will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Chat Container -->
+            <div class="chat-container flex-1 m-4 flex flex-col">
+                <!-- Welcome Message -->
+                <div id="welcome-section" class="p-8 text-center slide-up">
+                    <div class="inline-block p-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 mb-6 floating-element">
+                        <i class="fas fa-robot text-5xl text-white"></i>
+                    </div>
+                    <h1 class="text-4xl font-bold text-white mb-4">
+                        Welcome to Your AI Career Coach
+                    </h1>
+                    <p class="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+                        I'm here to help you navigate your career journey with personalized insights, 
+                        trending opportunities, and actionable advice. Let's unlock your potential together!
+                    </p>
+                    
+                    <!-- Feature Highlights -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="glass-dark p-6 rounded-2xl">
+                            <i class="fas fa-chart-line feature-icon text-3xl mb-4"></i>
+                            <h3 class="text-lg font-semibold text-white mb-2">Market Insights</h3>
+                            <p class="text-gray-300 text-sm">Real-time industry trends and salary data</p>
+                        </div>
+                        <div class="glass-dark p-6 rounded-2xl">
+                            <i class="fas fa-user-graduate feature-icon text-3xl mb-4"></i>
+                            <h3 class="text-lg font-semibold text-white mb-2">Personalized Guidance</h3>
+                            <p class="text-gray-300 text-sm">Tailored advice based on your experience</p>
+                            </div>
+                        <div class="glass-dark p-6 rounded-2xl">
+                            <i class="fas fa-rocket feature-icon text-3xl mb-4"></i>
+                            <h3 class="text-lg font-semibold text-white mb-2">Career Acceleration</h3>
+                            <p class="text-gray-300 text-sm">Strategic steps to reach your goals faster</p>
+                        </div>
+                    </div>
+
+                    <!-- Sample Questions -->
+                    <div class="text-left max-w-2xl mx-auto">
+                        <h3 class="text-lg font-semibold text-white mb-4">Try asking me about:</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="sample-question p-3 rounded-xl glass-dark cursor-pointer hover:bg-opacity-50 transition-all" onclick="askSampleQuestion('How can I transition into data science?')">
+                                <i class="fas fa-arrow-right text-blue-400 mr-2"></i>
+                                <span class="text-white">Career transitions</span>
+                            </div>
+                            <div class="sample-question p-3 rounded-xl glass-dark cursor-pointer hover:bg-opacity-50 transition-all" onclick="askSampleQuestion('What skills should I learn for software engineering?')">
+                                <i class="fas fa-arrow-right text-green-400 mr-2"></i>
+                                <span class="text-white">Skill development</span>
+                            </div>
+                            <div class="sample-question p-3 rounded-xl glass-dark cursor-pointer hover:bg-opacity-50 transition-all" onclick="askSampleQuestion('How do I negotiate my salary?')">
+                                <i class="fas fa-arrow-right text-yellow-400 mr-2"></i>
+                                <span class="text-white">Salary negotiation</span>
+                            </div>
+                            <div class="sample-question p-3 rounded-xl glass-dark cursor-pointer hover:bg-opacity-50 transition-all" onclick="askSampleQuestion('What are the latest trends in my industry?')">
+                                <i class="fas fa-arrow-right text-purple-400 mr-2"></i>
+                                <span class="text-white">Industry trends</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                <!-- Messages Container -->
+                <div id="messages" class="flex-1 p-6 overflow-y-auto space-y-4 scroll-smooth hidden">
+                    <!-- Messages will be dynamically added here -->
+                </div>
+
+                <!-- Chat Input -->
+                <div class="p-6 border-t border-white border-opacity-20">
+                    <div class="flex space-x-4">
+                        <input 
+                            type="text" 
+                            id="messageInput" 
+                            placeholder="Ask me anything about your career journey..."
+                            class="input-glass flex-1 px-6 py-4 rounded-2xl text-white placeholder-gray-300 focus:outline-none text-lg"
+                            onkeypress="handleKeyPress(event)"
+                        >
+                        <button 
+                            id="sendButton" 
+                            onclick="sendMessage()" 
+                            class="btn-primary px-8 py-4 rounded-2xl text-white font-semibold pulse-glow"
+                        >
+                            <i class="fas fa-paper-plane mr-2"></i>Send
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between mt-3 text-sm text-gray-300">
+                        <div class="flex items-center space-x-4">
+                            <span><i class="fas fa-magic mr-1"></i>AI-Powered</span>
+                            <span><i class="fas fa-shield-alt mr-1"></i>Secure</span>
+                            <span><i class="fas fa-clock mr-1"></i>Real-time</span>
+                    </div>
+                        <div class="text-xs">
+                            <span id="typing-status"></span>
+                    </div>
+                    </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let conversationCount = 0;
+        let recommendationCount = 0;
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTrendingTopics();
+            loadRecommendations();
+            animateWelcome();
+        });
+        
+        function animateWelcome() {
+            // Add staggered animations to welcome elements
+            const elements = document.querySelectorAll('.slide-up');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.2}s`;
+            });
+        }
+        
+        function askSampleQuestion(question) {
+            document.getElementById('messageInput').value = question;
+            sendMessage();
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (message === '') {
+                showNotification('Please enter a message', 'warning');
+                return;
+            }
+            
+            // Hide welcome section and show messages
+            hideWelcomeSection();
+            
+            // Add user message
+            addMessage(message, 'user');
+            
+            // Clear input and show typing indicator
+            messageInput.value = '';
+            showTypingIndicator();
+            
+            // Update conversation count
+            conversationCount++;
+            document.getElementById('chat-count').textContent = conversationCount;
+            
+            // Send message to backend
+            fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                body: JSON.stringify({
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideTypingIndicator();
+                addMessage(data.response, 'ai');
+                
+                // Update recommendations if provided
+                if (data.recommendations && data.recommendations.length > 0) {
+                    updateRecommendations(data.recommendations);
+                }
+            })
+            .catch(error => {
+                hideTypingIndicator();
+                console.error('Error:', error);
+                addMessage('I apologize, but I encountered an error. Please try again.', 'ai');
+                showNotification('Connection error. Please check your internet connection.', 'error');
+            });
+        }
+        
+        function hideWelcomeSection() {
+            const welcomeSection = document.getElementById('welcome-section');
+            const messagesContainer = document.getElementById('messages');
+            
+            if (!welcomeSection.classList.contains('hidden')) {
+                welcomeSection.style.transform = 'translateY(-20px)';
+                welcomeSection.style.opacity = '0';
+                setTimeout(() => {
+                    welcomeSection.classList.add('hidden');
+                    messagesContainer.classList.remove('hidden');
+                }, 300);
+            }
+        }
+        
+        function addMessage(content, sender) {
+            const messagesContainer = document.getElementById('messages');
+                const messageDiv = document.createElement('div');
+            messageDiv.className = `message-${sender} p-4 rounded-2xl max-w-4xl ${sender === 'user' ? 'ml-auto' : 'mr-auto'}`;
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-1">
+                            <p class="text-white">${content}</p>
+                        </div>
+                        <div class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Format AI response with better styling
+                const formattedContent = formatAIResponse(content);
+                messageDiv.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <div class="flex-1 ai-response">
+                            ${formattedContent}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function formatAIResponse(content) {
+            return content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/### (.*)/g, '<h3>$1</h3>')
+                .replace(/## (.*)/g, '<h2>$1</h2>')
+                .replace(/# (.*)/g, '<h1>$1</h1>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n- /g, '<br>• ')
+                .replace(/\n\d+\. /g, '<br>$&')
+                .replace(/^/, '<p>')
+                .replace(/$/, '</p>')
+                .replace(/<p><\/p>/g, '');
+        }
+        
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'message-ai p-4 rounded-2xl max-w-4xl mr-auto';
+            typingDiv.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Update typing status
+            document.getElementById('typing-status').textContent = 'AI is thinking...';
+        }
+        
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+            document.getElementById('typing-status').textContent = '';
+        }
+        
+        function loadTrendingTopics() {
+            fetch('/api/trends?topic=Software Engineer')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('trending-topics');
+                    container.innerHTML = '';
+                    
+                    data.trends.slice(0, 5).forEach((trend, index) => {
+                        const trendDiv = document.createElement('div');
+                        trendDiv.className = 'trend-card p-3 rounded-xl';
+                        trendDiv.style.animationDelay = `${index * 0.1}s`;
+                        trendDiv.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <div class="text-white text-sm font-medium">${trend}</div>
+                                    <div class="text-gray-300 text-xs">Trending in tech</div>
+                                </div>
+                                <i class="fas fa-arrow-trend-up text-orange-400 text-sm"></i>
+                            </div>
+                        `;
+                        trendDiv.onclick = () => askSampleQuestion(`Tell me about ${trend}`);
+                        container.appendChild(trendDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading trends:', error);
+                    // Show fallback trends
+                    showFallbackTrends();
+                });
+        }
+        
+        function showFallbackTrends() {
+            const fallbackTrends = [
+                'AI Engineer roles',
+                'Remote work trends',
+                'Tech salary insights',
+                'Skills in demand',
+                'Career transitions'
+            ];
+            
+            const container = document.getElementById('trending-topics');
+            container.innerHTML = '';
+            
+            fallbackTrends.forEach((trend, index) => {
+                const trendDiv = document.createElement('div');
+                trendDiv.className = 'trend-card p-3 rounded-xl';
+                trendDiv.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="text-white text-sm font-medium">${trend}</div>
+                            <div class="text-gray-300 text-xs">Popular topic</div>
+                        </div>
+                        <i class="fas fa-fire text-orange-400 text-sm"></i>
+                    </div>
+                `;
+                trendDiv.onclick = () => askSampleQuestion(`Tell me about ${trend}`);
+                container.appendChild(trendDiv);
+            });
+        }
+        
+        function refreshTrends() {
+            const topics = ['Data Science', 'Software Engineer', 'Product Manager', 'UX Designer', 'Marketing'];
+            const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+            
+            showNotification('Refreshing trends...', 'info');
+            loadTrendingTopics();
+        }
+        
+        function loadRecommendations() {
+            fetch('/api/recommendations')
+                .then(response => response.json())
+                .then(data => {
+                    updateRecommendations(data.recommendations);
+                })
+                .catch(error => {
+                    console.error('Error loading recommendations:', error);
+                    showFallbackRecommendations();
+                });
+        }
+        
+        function updateRecommendations(recommendations) {
+            const container = document.getElementById('recommendations');
+            container.innerHTML = '';
+            
+            recommendationCount = recommendations.length;
+            document.getElementById('recommendation-count').textContent = recommendationCount;
+            
+            recommendations.slice(0, 5).forEach((rec, index) => {
+                const recDiv = document.createElement('div');
+                recDiv.className = 'recommendation-card p-3 rounded-xl cursor-pointer';
+                recDiv.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-lightbulb text-white text-xs"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-white text-sm font-medium">${rec}</div>
+                            <div class="text-gray-300 text-xs">Personalized for you</div>
+                        </div>
+                    </div>
+                `;
+                recDiv.onclick = () => askSampleQuestion(rec);
+                container.appendChild(recDiv);
+            });
+        }
+        
+        function showFallbackRecommendations() {
+            const fallbackRecs = [
+                'How to improve my LinkedIn profile?',
+                'What certifications should I pursue?',
+                'Best practices for remote interviews',
+                'How to build a strong portfolio?',
+                'Tips for effective networking'
+            ];
+            updateRecommendations(fallbackRecs);
+        }
+        
+        function quickAction(action) {
+            const actions = {
+                'resume': 'How can I improve my resume to stand out to employers?',
+                'interview': 'What are the most common interview questions and how should I answer them?',
+                'salary': 'How do I research and negotiate my salary effectively?',
+                'skills': 'What skills should I focus on developing for my career?'
+            };
+            
+            if (actions[action]) {
+                askSampleQuestion(actions[action]);
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const icons = {
+                'info': 'fas fa-info-circle text-blue-400',
+                'warning': 'fas fa-exclamation-triangle text-yellow-400',
+                'error': 'fas fa-exclamation-triangle text-red-400',
+                'success': 'fas fa-check-circle text-green-400'
+            };
+            
+            notification.className = `fixed top-20 right-4 z-50 p-4 rounded-2xl glass-card text-white font-semibold transform translate-x-full transition-transform duration-300 max-w-sm`;
+            notification.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <i class="${icons[type]} mt-1"></i>
+                    <div class="flex-1">${message}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                notification.style.transform = 'translateX(full)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

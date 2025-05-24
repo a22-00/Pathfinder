@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathfinder Pro | AI-Powered Developer Career Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 50%, #ede9fe 100%);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-nav: rgba(255, 255, 255, 0.9);
+            --bg-hero: rgba(255, 255, 255, 0.9);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --border-color: rgba(139, 92, 246, 0.1);
+            --shadow-color: rgba(139, 92, 246, 0.1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            --bg-card: rgba(26, 26, 46, 0.95);
+            --bg-nav: rgba(15, 15, 35, 0.95);
+            --bg-hero: rgba(26, 26, 46, 0.9);
+            --text-primary: #ffffff;
+            --text-secondary: #d1d5db;
+            --text-light: #9ca3af;
+            --border-color: rgba(0, 255, 157, 0.2);
+            --shadow-color: rgba(0, 255, 157, 0.1);
+        }
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: var(--bg-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-glass {
+            background: var(--bg-nav);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .hero-section {
+            background: var(--bg-hero);
+            border: 1px solid var(--border-color);
+        }
+        
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 20px rgba(79, 172, 254, 0.5); }
+            to { box-shadow: 0 0 30px rgba(79, 172, 254, 0.8); }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff9d 0%, #00e6ff 100%);
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 255, 157, 0.4);
+            color: #0f0f23;
+            font-weight: 700;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 157, 0.6);
+        }
+        
+        .btn-secondary {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+            color: #7c3aed;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 8s ease-in-out infinite;
+        }
+        
+        @keyframes particleFloat {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateY(-100px) rotate(180deg);
+                opacity: 0.3;
+            }
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(34, 197, 94, 0.8));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .tech-icon {
+            transition: all 0.3s ease;
+            filter: grayscale(100%) opacity(0.7);
+        }
+        
+        .tech-icon:hover {
+            filter: grayscale(0%) opacity(1);
+            transform: scale(1.1);
+        }
+        
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Particles -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="particle" style="top: 10%; left: 10%; width: 4px; height: 4px; animation-delay: 0s;"></div>
+        <div class="particle" style="top: 20%; left: 80%; width: 6px; height: 6px; animation-delay: 2s;"></div>
+        <div class="particle" style="top: 60%; left: 15%; width: 3px; height: 3px; animation-delay: 4s;"></div>
+        <div class="particle" style="top: 80%; left: 70%; width: 5px; height: 5px; animation-delay: 6s;"></div>
+        <div class="particle" style="top: 40%; left: 90%; width: 4px; height: 4px; animation-delay: 3s;"></div>
+        <div class="particle" style="top: 30%; left: 50%; width: 7px; height: 7px; animation-delay: 5s;"></div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="text-2xl font-bold" style="color: var(--text-primary);">
+                        <i class="fas fa-brain mr-2 text-purple-500"></i>
+                        Pathfinder <span class="text-purple-600">Pro</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="transition-colors" style="color: var(--text-primary);">Features</a>
+                    <a href="#how-it-works" class="transition-colors" style="color: var(--text-primary);">How It Works</a>
+                    <a href="#testimonials" class="transition-colors" style="color: var(--text-primary);">Success Stories</a>
+                    <a href="/auth/login" class="transition-colors" style="color: var(--text-primary);">Sign In</a>
+                    <button id="themeToggle" class="theme-toggle">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    <a href="/auth/register" class="btn-primary px-6 py-2 rounded-full font-semibold">
+                        Get Started Free
+                    </a>
+                </div>
+                <div class="md:hidden">
+                    <button class="text-white">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="relative pt-20 pb-16 min-h-screen flex items-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center">
+
+                <div class="hero-section p-12 rounded-3xl mb-12 slide-up">
+                    <div class="inline-block p-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 mb-8 floating-element">
+                        <i class="fas fa-rocket text-6xl text-white"></i>
+                    </div>
+                    
+                    <h1 class="text-6xl md:text-7xl font-black mb-6 leading-tight" style="color: var(--text-primary);">
+                        Your AI-Powered<br>
+                        <span class="gradient-text">Career Intelligence</span><br>
+                        Platform
+                    </h1>
+                    
+                    <p class="text-2xl mb-8 max-w-3xl mx-auto leading-relaxed" style="color: var(--text-secondary);">
+                        Transform your career journey with cutting-edge AI technology. 
+                        Get personalized guidance, market insights, and skills assessments 
+                        that adapt to your unique goals.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-12">
+                        <a href="/auth/register" class="btn-primary px-12 py-4 rounded-2xl font-bold text-xl pulse-glow">
+                            <i class="fas fa-play mr-3"></i>
+                            Start Your Journey
+                        </a>
+                        <a href="/auth/login" class="btn-secondary px-12 py-4 rounded-2xl text-cyan-400 font-bold text-xl">
+                            <i class="fas fa-sign-in-alt mr-3"></i>
+                            Sign In
+                        </a>
+                    </div>
+                    
+
+                    <div class="flex flex-wrap justify-center items-center space-x-8" style="color: var(--text-secondary);">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-shield-check text-green-400"></i>
+                            <span>100% Secure</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-clock text-blue-400"></i>
+                            <span>Real-time Data</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-robot text-purple-400"></i>
+                            <span>AI-Powered</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-graduation-cap text-green-400"></i>
+                            <span>Career Growth</span>
+                        </div>
+                    </div>
+                </div>
+                
+
+                <div class="scroll-indicator">
+                    <i class="fas fa-chevron-down text-white text-2xl opacity-70"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="py-20 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="glass-card p-8 rounded-2xl text-center slide-up" style="animation-delay: 0.1s;">
+                    <div class="w-16 h-16 bg-green-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-brain text-2xl text-green-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2" style="color: var(--text-primary);">AI-Powered Analysis</h3>
+                    <p class="text-sm" style="color: var(--text-secondary);">Advanced algorithms analyze your skills, experience, and market trends</p>
+                </div>
+                <div class="glass-card p-8 rounded-2xl text-center slide-up" style="animation-delay: 0.2s;">
+                    <div class="w-16 h-16 bg-blue-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-clock text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2" style="color: var(--text-primary);">Always Available</h3>
+                    <p class="text-sm" style="color: var(--text-secondary);">Get instant career guidance whenever you need it, day or night</p>
+                </div>
+                <div class="glass-card p-8 rounded-2xl text-center slide-up" style="animation-delay: 0.3s;">
+                    <div class="w-16 h-16 bg-purple-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-trending-up text-2xl text-purple-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2" style="color: var(--text-primary);">Real-Time Market Data</h3>
+                    <p class="text-sm" style="color: var(--text-secondary);">Stay current with live job market insights and industry trends</p>
+                </div>
+                <div class="glass-card p-8 rounded-2xl text-center slide-up" style="animation-delay: 0.4s;">
+                    <div class="w-16 h-16 bg-orange-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-graduate text-2xl text-orange-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2" style="color: var(--text-primary);">Personalized Learning</h3>
+                    <p class="text-sm" style="color: var(--text-secondary);">Custom recommendations tailored to your career goals and background</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits -->
+    <section class="py-16 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4" style="color: var(--text-primary);">
+                    Why Choose <span class="text-purple-600">Pathfinder Pro</span>?
+                </h2>
+                <p class="text-lg max-w-2xl mx-auto" style="color: var(--text-secondary);">
+                    Experience the power of AI-driven career guidance designed to accelerate your professional journey
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-2xl text-center slide-up" style="animation-delay: 0.1s;">
+                    <div class="w-16 h-16 bg-green-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-robot text-2xl text-green-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">AI-Powered Insights</h3>
+                    <p style="color: var(--text-secondary);">Advanced AI analyzes your profile and market trends for personalized guidance</p>
+                </div>
+                <div class="glass-card p-8 rounded-2xl text-center slide-up" style="animation-delay: 0.2s;">
+                    <div class="w-16 h-16 bg-blue-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Real-time Market Data</h3>
+                    <p style="color: var(--text-secondary);">Stay updated with the latest industry trends and salary insights</p>
+                </div>
+                <div class="glass-card p-8 rounded-2xl text-center slide-up" style="animation-delay: 0.3s;">
+                    <div class="w-16 h-16 bg-purple-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-code-branch text-2xl text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Personalized Learning</h3>
+                    <p style="color: var(--text-secondary);">Custom learning paths and skill assessments tailored to your goals</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-6">
+                    Powerful Features for Your
+                    <span class="text-green-400">Career Growth</span>
+                </h2>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                    Our AI-powered platform provides everything you need to accelerate your career journey
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-2xl slide-up" style="animation-delay: 0.1s;">
+                    <div class="w-16 h-16 bg-purple-500 bg-opacity-20 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-comments text-2xl text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">AI Career Coach</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        Get personalized career advice powered by advanced AI that understands your unique situation and goals.
+                    </p>
+                </div>
+                
+                <div class="glass-card p-8 rounded-2xl slide-up" style="animation-delay: 0.2s;">
+                    <div class="w-16 h-16 bg-green-500 bg-opacity-20 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-brain text-2xl text-green-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Skills Assessment</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        Take comprehensive assessments to identify your strengths and areas for improvement with detailed learning plans.
+                    </p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl slide-up" style="animation-delay: 0.3s;">
+                    <div class="w-16 h-16 bg-blue-500 bg-opacity-20 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-trending-up text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Market Insights</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        Stay ahead with real-time industry trends, salary data, and job market analysis tailored to your field.
+                    </p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl slide-up" style="animation-delay: 0.4s;">
+                    <div class="w-16 h-16 bg-purple-500 bg-opacity-20 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-lightbulb text-2xl text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Smart Recommendations</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        Receive intelligent suggestions for courses, certifications, and career moves based on your profile.
+                    </p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl slide-up" style="animation-delay: 0.5s;">
+                    <div class="w-16 h-16 bg-indigo-500 bg-opacity-20 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-user-graduate text-2xl text-indigo-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Interview Prep</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        Practice with AI-generated interview questions and get feedback to improve your performance.
+                    </p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl slide-up" style="animation-delay: 0.6s;">
+                    <div class="w-16 h-16 bg-orange-500 bg-opacity-20 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-file-alt text-2xl text-orange-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Resume Optimization</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        Get AI-powered feedback on your resume to increase your chances of landing your dream job.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-20 relative z-10">
+        <div class="section-divider mb-20"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-black text-white mb-6">
+                    How <span class="gradient-text">Pathfinder Pro</span> Works
+                </h2>
+                <p class="text-xl text-gray-200 max-w-3xl mx-auto">
+                    Get started in minutes and transform your career journey with our simple 3-step process
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="text-center slide-up" style="animation-delay: 0.1s;">
+                    <div class="relative mb-8">
+                        <div class="w-32 h-32 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 floating-element">
+                            <span class="text-4xl font-black text-white">1</span>
+                        </div>
+                        <div class="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+                            <i class="fas fa-star text-yellow-800 text-sm"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Share Your Goals</h3>
+                    <p class="text-gray-200 leading-relaxed">
+                        Tell our AI about your career aspirations, current situation, and what you want to achieve.
+                    </p>
+                </div>
+
+                <div class="text-center slide-up" style="animation-delay: 0.2s;">
+                    <div class="relative mb-8">
+                        <div class="w-32 h-32 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4 floating-element" style="animation-delay: 1s;">
+                            <span class="text-4xl font-black text-white">2</span>
+                        </div>
+                        <div class="absolute -top-2 -right-2 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-green-800 text-sm"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Get AI Analysis</h3>
+                    <p class="text-gray-200 leading-relaxed">
+                        Our advanced AI analyzes your profile and market data to create personalized recommendations.
+                    </p>
+                </div>
+
+                <div class="text-center slide-up" style="animation-delay: 0.3s;">
+                    <div class="relative mb-8">
+                        <div class="w-32 h-32 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 floating-element" style="animation-delay: 2s;">
+                            <span class="text-4xl font-black text-white">3</span>
+                        </div>
+                        <div class="absolute -top-2 -right-2 w-8 h-8 bg-purple-400 rounded-full flex items-center justify-center">
+                            <i class="fas fa-rocket text-purple-800 text-sm"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Execute Your Plan</h3>
+                    <p class="text-gray-200 leading-relaxed">
+                        Follow your customized roadmap with ongoing support and real-time adjustments as you progress.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community -->
+    <section id="community" class="py-20 relative z-10">
+        <div class="section-divider mb-20"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-6" style="color: var(--text-primary);">
+                    Join Our Growing
+                    <span class="text-purple-600">Community</span>
+                </h2>
+                <p class="text-lg max-w-3xl mx-auto" style="color: var(--text-secondary);">
+                    Start your career transformation journey today. Be among the first to experience AI-powered career intelligence.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-2xl text-center slide-up" style="animation-delay: 0.1s;">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-rocket text-2xl text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Early Access</h3>
+                    <p class="leading-relaxed" style="color: var(--text-secondary);">
+                        Be among the first to experience our cutting-edge AI career intelligence platform.
+                    </p>
+    </div>
+
+                <div class="glass-card p-8 rounded-2xl text-center slide-up" style="animation-delay: 0.2s;">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-users text-2xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Growing Network</h3>
+                    <p class="leading-relaxed" style="color: var(--text-secondary);">
+                        Connect with like-minded professionals and build your career network.
+                    </p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl text-center slide-up" style="animation-delay: 0.3s;">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-star text-2xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Shape the Future</h3>
+                    <p class="leading-relaxed" style="color: var(--text-secondary);">
+                        Help us build the next generation of career intelligence tools with your feedback.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-20 relative z-10">
+        <div class="section-divider mb-20"></div>
+        
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="cta-section p-12 rounded-3xl slide-up">
+                <div class="inline-block p-6 rounded-full bg-white bg-opacity-20 mb-8">
+                    <i class="fas fa-rocket text-5xl text-white"></i>
+                </div>
+                
+                <h2 class="text-5xl font-black text-white mb-6">
+                    Ready to Transform Your Career?
+                </h2>
+                
+                <p class="text-xl text-gray-100 mb-8 max-w-2xl mx-auto">
+                    Join thousands of professionals who have accelerated their careers with Pathfinder Pro. 
+                    Start your journey today and unlock your full potential.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <a href="/job-seeker" class="btn-primary px-12 py-4 rounded-2xl text-white font-bold text-xl pulse-glow">
+                        <i class="fas fa-play mr-3"></i>
+                        Start Free Today
+                    </a>
+                    <a href="/assessment" class="btn-secondary px-12 py-4 rounded-2xl text-white font-bold text-xl">
+                        <i class="fas fa-brain mr-3"></i>
+                        Take Assessment
+                    </a>
+                </div>
+                
+                <div class="mt-8 text-sm text-gray-200">
+                    <i class="fas fa-shield-check mr-2"></i>
+                    No credit card required • Free forever plan available
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 relative z-10">
+        <div class="section-divider mb-12"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card p-8 rounded-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div class="col-span-1 md:col-span-2">
+                        <div class="text-2xl font-bold mb-4" style="color: var(--text-primary);">
+                            <i class="fas fa-brain mr-2 text-purple-500"></i>
+                            Pathfinder <span class="text-purple-600">Pro</span>
+                        </div>
+                        <p class="mb-6 max-w-md" style="color: var(--text-secondary);">
+                            Empowering careers through AI-driven insights and personalized guidance. 
+                            Your journey to professional success starts here.
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white hover:bg-blue-600 transition-colors">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center text-white hover:bg-gray-700 transition-colors">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                </div>
+                    
+                <div>
+                        <h3 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Platform</h3>
+                        <ul class="space-y-2" style="color: var(--text-secondary);">
+                            <li><a href="/job-seeker" class="hover:text-blue-300 transition-colors">AI Career Coach</a></li>
+                            <li><a href="/assessment" class="hover:text-blue-300 transition-colors">Skills Assessment</a></li>
+                            <li><a href="#" class="hover:text-blue-300 transition-colors">Market Insights</a></li>
+                            <li><a href="#" class="hover:text-blue-300 transition-colors">Interview Prep</a></li>
+                    </ul>
+                </div>
+                    
+                <div>
+                        <h3 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Support</h3>
+                        <ul class="space-y-2" style="color: var(--text-secondary);">
+                            <li><a href="#" class="hover:text-blue-300 transition-colors">Help Center</a></li>
+                            <li><a href="#" class="hover:text-blue-300 transition-colors">Contact Us</a></li>
+                            <li><a href="#" class="hover:text-blue-300 transition-colors">Privacy Policy</a></li>
+                            <li><a href="#" class="hover:text-blue-300 transition-colors">Terms of Service</a></li>
+                    </ul>
+                    </div>
+                </div>
+                
+                <div class="border-t border-opacity-20 mt-8 pt-8 text-center" style="border-color: var(--border-color); color: var(--text-light);">
+                    <p>&copy; 2024 Pathfinder Pro. All rights reserved. Powered by advanced AI technology.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const body = document.body;
+            
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                
+                if (isDark) {
+                    body.removeAttribute('data-theme');
+                    themeIcon.className = 'fas fa-moon';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    body.setAttribute('data-theme', 'dark');
+                    themeIcon.className = 'fas fa-sun';
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+
+            const elements = document.querySelectorAll('.slide-up');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const heroSection = document.querySelector('.hero-section');
+                if (heroSection) {
+                    heroSection.style.transform = `translateY(${scrolled * 0.1}px)`;
+                }
+            });
+            
+
+            const observerOptions = {
+                threshold: 0.5,
+                rootMargin: '0px 0px -100px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const statsNumbers = entry.target.querySelectorAll('.stats-card .text-4xl');
+                        statsNumbers.forEach(stat => {
+                            animateNumber(stat);
+                        });
+                    }
+                });
+            }, observerOptions);
+            
+            const statsSection = document.querySelector('#features').previousElementSibling;
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
+        });
+        
+        function animateNumber(element) {
+            const target = element.textContent;
+            const isPercentage = target.includes('%');
+            const isKPlus = target.includes('K+');
+            const isTwentyFourSeven = target.includes('24/7');
+            
+            if (isTwentyFourSeven) return;
+            
+            let endValue = parseInt(target.replace(/[^\d]/g, ''));
+            if (isKPlus) endValue = endValue * 1000;
+            
+            let startValue = 0;
+            const duration = 2000;
+            const increment = endValue / (duration / 16);
+            
+            const timer = setInterval(() => {
+                startValue += increment;
+                if (startValue >= endValue) {
+                    startValue = endValue;
+                    clearInterval(timer);
+                }
+                
+                let displayValue = Math.floor(startValue);
+                if (isKPlus) {
+                    displayValue = Math.floor(displayValue / 1000) + 'K+';
+                } else if (isPercentage) {
+                    displayValue = displayValue + '%';
+                }
+                
+                element.textContent = displayValue;
+            }, 16);
+        }
+        
+
+        const mobileMenuButton = document.querySelector('.md\\:hidden button');
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', function() {
+
+                console.log('Mobile menu clicked');
+            });
+        }
+    </script>
+</body>
+</html>

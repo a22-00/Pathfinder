@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Setup | Pathfinder Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 50%, #ede9fe 100%);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --border-color: rgba(139, 92, 246, 0.2);
+            --shadow-color: rgba(139, 92, 246, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-focus: rgba(139, 92, 246, 0.8);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            --bg-card: rgba(26, 26, 46, 0.95);
+            --text-primary: #ffffff;
+            --text-secondary: #d1d5db;
+            --text-light: #9ca3af;
+            --border-color: rgba(0, 255, 157, 0.3);
+            --shadow-color: rgba(0, 255, 157, 0.1);
+            --input-bg: rgba(15, 15, 35, 0.9);
+            --input-focus: rgba(0, 255, 157, 0.8);
+        }
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: var(--bg-primary);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .input-glass {
+            background: var(--input-bg);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+        
+        .input-glass:focus {
+            background: var(--bg-card);
+            border-color: var(--input-focus);
+            box-shadow: 0 0 20px var(--shadow-color);
+            outline: none;
+        }
+        
+        .input-glass::placeholder {
+            color: var(--text-light);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+        }
+        
+        .progress-step {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+        
+        .progress-step.active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border-color: #8b5cf6;
+            transform: scale(1.1);
+            color: white;
+        }
+        
+        .progress-line {
+            height: 2px;
+            background: var(--border-color);
+            flex: 1;
+            margin: 0 1rem;
+        }
+        
+        .progress-line.active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+    </style>
+</head>
+  <body class="min-h-screen flex items-center justify-center py-8">
+
+    <button id="themeToggle" class="theme-toggle">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+    <div class="max-w-2xl w-full mx-4">
+        <!-- Progress Indicator -->
+        <div class="flex items-center justify-center mb-12 slide-up">
+            <div class="flex items-center">
+                <div class="progress-step active flex items-center justify-center">
+                    <i class="fas fa-user text-white text-xl"></i>
+                </div>
+                <div class="progress-line active"></div>
+                <div class="progress-step flex items-center justify-center">
+                    <i class="fas fa-briefcase text-white text-xl"></i>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step flex items-center justify-center">
+                    <i class="fas fa-rocket text-white text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="text-center mb-8 slide-up" style="animation-delay: 0.2s;">
+            <div class="inline-block p-6 rounded-full bg-gradient-to-r from-green-500 to-blue-600 mb-6 floating-element">
+                <i class="fas fa-user-plus text-5xl text-white"></i>
+            </div>
+            <h1 class="text-4xl font-bold mb-4" style="color: var(--text-primary);">
+                Welcome to <span class="text-blue-300">Pathfinder Pro!</span>
+            </h1>
+            <p class="text-xl max-w-md mx-auto" style="color: var(--text-secondary);">
+                Let's set up your profile to provide you with personalized career guidance and insights.
+            </p>
+        </div>
+
+        <!-- Setup Form -->
+        <div class="glass-card p-8 slide-up" style="animation-delay: 0.4s;">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                
+                <div class="space-y-8">
+                    <!-- Profession Section -->
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-briefcase text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold" style="color: var(--text-primary);">Professional Background</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                {{ form.profession.label(class="block font-medium mb-2", style="color: var(--text-primary);") }}
+                                {{ form.profession(class="input-glass w-full px-4 py-3 rounded-xl focus:outline-none", placeholder="e.g., Software Engineer, Data Scientist, Marketing Manager") }}
+                                {% if form.profession.errors %}
+                                    <div class="mt-1 text-red-300 text-sm">
+                                        {% for error in form.profession.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {{ form.experience_level.label(class="block font-medium mb-2", style="color: var(--text-primary);") }}
+                                {{ form.experience_level(class="input-glass w-full px-4 py-3 rounded-xl focus:outline-none") }}
+                                {% if form.experience_level.errors %}
+                                    <div class="mt-1 text-red-300 text-sm">
+                                        {% for error in form.experience_level.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Career Goals Section -->
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-target text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold" style="color: var(--text-primary);">Career Aspirations</h3>
+                        </div>
+                        
+                        <div>
+                            {{ form.career_goals.label(class="block font-medium mb-2", style="color: var(--text-primary);") }}
+                            {{ form.career_goals(class="input-glass w-full px-4 py-3 rounded-xl focus:outline-none resize-none", rows="4", placeholder="Describe your career goals, aspirations, and what you'd like to achieve in the next few years...") }}
+                            <p class="text-sm mt-2" style="color: var(--text-secondary);">
+                                <i class="fas fa-lightbulb mr-1"></i>
+                                Tip: Be specific about roles, skills, or industries you're interested in
+                            </p>
+                            {% if form.career_goals.errors %}
+                                <div class="mt-1 text-red-300 text-sm">
+                                    {% for error in form.career_goals.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Benefits Preview -->
+                    <div class="bg-gradient-to-r from-blue-500/20 to-purple-600/20 p-6 rounded-2xl border border-blue-400/30">
+                        <h4 class="text-lg font-semibold mb-4 flex items-center" style="color: var(--text-primary);">
+                            <i class="fas fa-star mr-2 text-yellow-400"></i>
+                            What you'll get with Pathfinder Pro
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="flex items-center" style="color: var(--text-secondary);">
+                                <i class="fas fa-check text-green-400 mr-2"></i>
+                                Personalized AI career coaching
+                            </div>
+                            <div class="flex items-center" style="color: var(--text-secondary);">
+                                <i class="fas fa-check text-green-400 mr-2"></i>
+                                Skills assessments & learning plans
+                            </div>
+                            <div class="flex items-center" style="color: var(--text-secondary);">
+                                <i class="fas fa-check text-green-400 mr-2"></i>
+                                Industry trends & salary insights
+                            </div>
+                            <div class="flex items-center" style="color: var(--text-secondary);">
+                                <i class="fas fa-check text-green-400 mr-2"></i>
+                                Interview preparation tools
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        {{ form.submit(class="btn-primary px-12 py-4 rounded-2xl text-white font-bold text-lg") }}
+                        <p class="text-sm mt-4" style="color: var(--text-secondary);">
+                            You can always update this information later in your profile settings
+                        </p>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Skip Option -->
+        <div class="text-center mt-6 slide-up" style="animation-delay: 0.6s;">
+            <a href="{{ url_for('dashboard') }}" class="transition-colors" style="color: var(--text-secondary);" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-secondary)'">
+                Skip for now and explore the dashboard
+                <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Add staggered animations and theme toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.slide-up');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.2}s`;
+            });
+
+            // Add form validation feedback
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Setting up your profile...';
+                submitBtn.disabled = true;
+            });
+            
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const body = document.body;
+            
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                
+                if (isDark) {
+                    body.removeAttribute('data-theme');
+                    themeIcon.className = 'fas fa-moon';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    body.setAttribute('data-theme', 'dark');
+                    themeIcon.className = 'fas fa-sun';
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Pathfinder Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 50%, #ede9fe 100%);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-nav: rgba(255, 255, 255, 0.9);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --border-color: rgba(139, 92, 246, 0.2);
+            --shadow-color: rgba(139, 92, 246, 0.1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            --bg-card: rgba(26, 26, 46, 0.95);
+            --bg-nav: rgba(15, 15, 35, 0.95);
+            --text-primary: #ffffff;
+            --text-secondary: #d1d5db;
+            --text-light: #9ca3af;
+            --border-color: rgba(0, 255, 157, 0.3);
+            --shadow-color: rgba(0, 255, 157, 0.1);
+        }
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: var(--bg-primary);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-glass {
+            background: var(--bg-nav);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+        }
+        
+        .activity-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+        }
+        
+        .recommendation-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(34, 197, 94, 0.2));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .assessment-card {
+            background: linear-gradient(135deg, rgba(51, 65, 85, 0.5), rgba(71, 85, 105, 0.5));
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .assessment-card:hover {
+            border-color: rgba(100, 116, 139, 0.5);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.1);
+        }
+        
+        .assessment-icon-excellent {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .assessment-icon-good {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .assessment-icon-needs-improvement {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+    </style>
+</head>
+  <body class="min-h-screen">
+    <button id="themeToggle" class="theme-toggle">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+    
+    <!-- Navigation -->
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="text-2xl font-bold" style="color: var(--text-primary);">
+                        <i class="fas fa-brain mr-2 text-purple-500"></i>
+                        Pathfinder <span class="text-purple-600">Pro</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="/chat" style="color: var(--text-secondary);" class="hover:text-purple-600 transition-colors">
+                        <i class="fas fa-comments mr-1"></i> AI Chat
+                    </a>
+                    <a href="/assessment" style="color: var(--text-secondary);" class="hover:text-purple-600 transition-colors">
+                        <i class="fas fa-graduation-cap mr-1"></i> Assessment
+                    </a>
+                    <a href="/profile" style="color: var(--text-secondary);" class="hover:text-purple-600 transition-colors">
+                        <i class="fas fa-user mr-1"></i> Profile
+                    </a>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                        <span class="text-sm" style="color: var(--text-primary);">{{ user.get_full_name() }}</span>
+                        <a href="/auth/logout" style="color: var(--text-secondary);" class="hover:text-red-500 ml-2 transition-colors">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Welcome Section -->
+            <div class="mb-8 slide-up">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center floating-element">
+                        <i class="fas fa-rocket text-2xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold" style="color: var(--text-primary);">
+                            Welcome back, {{ user.first_name or user.username }}! 👋
+                        </h1>
+                        <p class="text-lg" style="color: var(--text-secondary);">
+                            Ready to accelerate your career journey today?
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card p-6 rounded-2xl slide-up" style="animation-delay: 0.1s;">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium" style="color: var(--text-secondary);">Assessments Taken</p>
+                            <p class="text-3xl font-bold" style="color: var(--text-primary);">{{ stats.total }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-brain text-white"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card p-6 rounded-2xl slide-up" style="animation-delay: 0.2s;">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium" style="color: var(--text-secondary);">Average Score</p>
+                            <p class="text-3xl font-bold" style="color: var(--text-primary);">{{ stats.average_score }}%</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-line text-white"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card p-6 rounded-2xl slide-up" style="animation-delay: 0.3s;">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium" style="color: var(--text-secondary);">Best Score</p>
+                            <p class="text-3xl font-bold" style="color: var(--text-primary);">{{ stats.highest_score }}%</p>
+                        </div>
+                        <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-trophy text-white"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card p-6 rounded-2xl slide-up" style="animation-delay: 0.4s;">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium" style="color: var(--text-secondary);">Conversations</p>
+                            <p class="text-3xl font-bold" style="color: var(--text-primary);">{{ conversations|length }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-comments text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Quick Actions -->
+                <div class="lg:col-span-2">
+                    <div class="glass-card p-8 slide-up" style="animation-delay: 0.5s;">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-primary);">
+                            <i class="fas fa-bolt mr-3 text-yellow-400"></i>
+                            Quick Actions
+                        </h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="/chat" class="btn-primary p-6 rounded-2xl text-center hover:no-underline group">
+                                <div class="flex items-center justify-center mb-3">
+                                    <i class="fas fa-comments text-3xl text-white group-hover:scale-110 transition-transform"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-white mb-2">AI Career Coach</h3>
+                                <p class="text-gray-200 text-sm">Get personalized career advice and guidance</p>
+                            </a>
+
+                            <a href="/assessment" class="btn-primary p-6 rounded-2xl text-center hover:no-underline group" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                <div class="flex items-center justify-center mb-3">
+                                    <i class="fas fa-brain text-3xl text-white group-hover:scale-110 transition-transform"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-white mb-2">Skills Assessment</h3>
+                                <p class="text-gray-200 text-sm">Test your knowledge and get learning plans</p>
+                            </a>
+
+                            <a href="/profile" class="btn-primary p-6 rounded-2xl text-center hover:no-underline group" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                                <div class="flex items-center justify-center mb-3">
+                                    <i class="fas fa-user text-3xl text-white group-hover:scale-110 transition-transform"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-white mb-2">Update Profile</h3>
+                                <p class="text-gray-200 text-sm">Manage your profile and preferences</p>
+                            </a>
+
+                            <a href="#" class="btn-primary p-6 rounded-2xl text-center hover:no-underline group" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                                <div class="flex items-center justify-center mb-3">
+                                    <i class="fas fa-chart-trending-up text-3xl text-white group-hover:scale-110 transition-transform"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-white mb-2">Market Insights</h3>
+                                <p class="text-gray-200 text-sm">Explore industry trends and opportunities</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Recent Conversations -->
+                    {% if conversations %}
+                    <div class="glass-card p-8 mt-6 slide-up" style="animation-delay: 0.7s;">
+                        <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+                            <i class="fas fa-history mr-3 text-blue-400"></i>
+                            Recent Conversations
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            {% for conv in conversations %}
+                            <div class="activity-item p-4 rounded-xl">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <h4 class="text-white font-medium">{{ conv.title }}</h4>
+                                        <p class="text-gray-300 text-sm mt-1">{{ conv.get_message_count() }} messages</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-gray-400 text-xs">{{ conv.updated_at.strftime('%b %d') }}</p>
+                                        <a href="/chat?conversation={{ conv.id }}" class="text-blue-400 hover:text-blue-300 text-sm">
+                                            Continue <i class="fas fa-arrow-right ml-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Profile Card -->
+                    <div class="glass-card p-6 slide-up" style="animation-delay: 0.6s;">
+                        <div class="text-center mb-4">
+                            <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-user text-3xl text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">{{ user.get_full_name() }}</h3>
+                            {% if user.profession %}
+                                <p class="text-gray-300">{{ user.profession }}</p>
+                            {% endif %}
+                            {% if user.experience_level %}
+                                <p class="text-blue-300 text-sm">{{ user.experience_level }} Level</p>
+                            {% endif %}
+                        </div>
+                        
+                        {% if user.career_goals %}
+                        <div class="text-center">
+                            <p class="text-gray-200 text-sm italic">
+                                "{{ user.career_goals[:100] }}{% if user.career_goals|length > 100 %}...{% endif %}"
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Recommendations -->
+                    {% if recommendations %}
+                    <div class="glass-card p-6 slide-up" style="animation-delay: 0.8s;">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                            <i class="fas fa-lightbulb mr-2 text-yellow-400"></i>
+                            Recommendations
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            {% for rec in recommendations %}
+                            <div class="recommendation-card p-4 rounded-xl">
+                                <div class="flex items-start">
+                                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3 mt-1">
+                                        <i class="fas fa-star text-white text-sm"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-white font-medium text-sm">{{ rec.title }}</h4>
+                                        {% if rec.description %}
+                                            <p class="text-gray-300 text-xs mt-1">{{ rec.description[:80] }}{% if rec.description|length > 80 %}...{% endif %}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Recent Activities -->
+                    {% if activities %}
+                    <div class="glass-card p-6 slide-up" style="animation-delay: 0.9s;">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                            <i class="fas fa-clock mr-2 text-purple-400"></i>
+                            Recent Activity
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            {% for activity in activities[:5] %}
+                            <div class="flex items-center text-sm">
+                                <div class="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
+                                <div class="flex-1">
+                                    <p class="text-gray-200">{{ activity.description or activity.activity_type }}</p>
+                                    <p class="text-gray-400 text-xs">{{ activity.created_at.strftime('%b %d, %I:%M %p') }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Recent Assessments -->
+                    {% if recent_assessments %}
+                    <div class="glass-card p-8 mt-6 slide-up" style="animation-delay: 0.8s;">
+                        <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+                            <i class="fas fa-graduation-cap mr-3 text-green-400"></i>
+                            Recent Assessments
+                            {% if assessment_completed %}
+                                <span class="ml-2 px-3 py-1 bg-green-500 text-white text-xs rounded-full animate-pulse">
+                                    <i class="fas fa-check mr-1"></i>NEW
+                                </span>
+                            {% endif %}
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            {% for assessment in recent_assessments %}
+                            <div class="activity-item p-5 rounded-xl {% if loop.first and assessment_completed %}ring-2 ring-green-400 ring-opacity-50 bg-green-900 bg-opacity-20{% endif %}">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start space-x-4 flex-1">
+                                        <div class="w-12 h-12 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-brain text-white"></i>
+                                        </div>
+                                        
+                                        <div class="flex-1 min-w-0">
+                                            <!-- Topic Name -->
+                                            <div class="flex items-center space-x-3 mb-3">
+                                                <h4 class="text-white font-semibold text-lg capitalize">{{ assessment.topic }}</h4>
+                                                {% if loop.first and assessment_completed %}
+                                                    <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full border border-green-500/30">
+                                                        <i class="fas fa-sparkles mr-1"></i>Latest
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Score Section -->
+                                            <div class="mb-2">
+                                                <span class="text-2xl font-bold {% if assessment.score/assessment.total_questions >= 0.8 %}text-green-400{% elif assessment.score/assessment.total_questions >= 0.6 %}text-yellow-400{% else %}text-red-400{% endif %}">
+                                                    {{ assessment.score }}/{{ assessment.total_questions }}
+                                                </span>
+                                                <span class="ml-2 px-2 py-1 {% if assessment.score/assessment.total_questions >= 0.8 %}bg-green-500/20 text-green-400{% elif assessment.score/assessment.total_questions >= 0.6 %}bg-yellow-500/20 text-yellow-400{% else %}bg-red-500/20 text-red-400{% endif %} text-sm rounded-lg font-medium">
+                                                    {{ ((assessment.score/assessment.total_questions)*100)|round|int }}%
+                                                </span>
+                                            </div>
+                                            
+                                            <!-- Date -->
+                                            <div class="mb-3">
+                                                <span class="text-gray-400 text-sm">
+                                                    <i class="fas fa-calendar-alt mr-1"></i>
+                                                    {{ assessment.created_at.strftime('%b %d, %Y') }}
+                                                </span>
+                                            </div>
+                                            
+                                            <!-- Progress Bar -->
+                                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                                <div class="h-2 rounded-full {% if assessment.score/assessment.total_questions >= 0.8 %}bg-green-400{% elif assessment.score/assessment.total_questions >= 0.6 %}bg-yellow-400{% else %}bg-red-400{% endif %}" 
+                                                     style="width: {{ ((assessment.score/assessment.total_questions)*100)|round|int }}%">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Right Side Actions -->
+                                    <div class="flex flex-col items-end space-y-2 ml-4">
+                                        {% if loop.first and assessment_completed %}
+                                            <div class="text-green-400 text-sm font-semibold">
+                                                <i class="fas fa-sparkles mr-1"></i>Just Completed!
+                                            </div>
+                                        {% endif %}
+                                        <a href="/assessment?topic={{ assessment.topic|urlencode }}" 
+                                           class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+                                            <i class="fas fa-redo mr-1"></i>Retake
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <a href="/assessment" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold">
+                                <i class="fas fa-plus mr-2"></i>Take New Assessment
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="glass-card p-8 mt-6 slide-up" style="animation-delay: 0.8s;">
+                        <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+                            <i class="fas fa-graduation-cap mr-3 text-green-400"></i>
+                            Assessment Center
+                        </h3>
+                        
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-brain text-2xl text-white"></i>
+                            </div>
+                            <h4 class="text-white font-semibold mb-2">Ready to test your skills?</h4>
+                            <p class="text-gray-300 text-sm mb-6">Take your first AI-powered assessment and get personalized learning recommendations.</p>
+                            <a href="/assessment" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold">
+                                <i class="fas fa-rocket mr-2"></i>Start Your First Assessment
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add staggered animations and theme toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.slide-up');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const body = document.body;
+            
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                
+                if (isDark) {
+                    body.removeAttribute('data-theme');
+                    themeIcon.className = 'fas fa-moon';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    body.setAttribute('data-theme', 'dark');
+                    themeIcon.className = 'fas fa-sun';
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

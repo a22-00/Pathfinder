@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Interview Preparation Plan - Pathfinder AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-indigo-600">Pathfinder AI</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Features</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">About</a>
+                    <a href="#" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="gradient-bg py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6">
+                Your Personalized Interview Plan
+            </h1>
+            <p class="text-xl md:text-2xl text-indigo-100 mb-8 max-w-3xl mx-auto">
+                AI-generated preparation guide for {{ inputs.job_title }} at {{ inputs.company_name }}
+            </p>
+            <div class="bg-white bg-opacity-20 rounded-lg p-4 inline-block">
+                <p class="text-white text-lg">
+                    <strong>Timeline:</strong> {{ inputs.timeframe }} |
+                    <strong>Industry:</strong> {{ inputs.industry }} |
+                    <strong>Experience:</strong> {{ inputs.current_experience }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">🎯 Self-Assessment Questions</h3>
+                    <p class="text-sm text-gray-600 mb-4">Reflect on these questions before your interview:</p>
+                    <div class="space-y-3">
+                        {% for question in assessment_questions %}
+                        {% if question %}
+                        <div class="p-3 bg-blue-50 rounded-lg">
+                            <p class="text-sm text-blue-900">{{ question }}</p>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if trends %}
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">📈 Trending Topics</h3>
+                    <p class="text-sm text-gray-600 mb-4">Current trends related to {{ topic }}:</p>
+                    <div class="space-y-2">
+                        {% for trend in trends %}
+                        <div class="p-2 bg-green-50 rounded border-l-4 border-green-400">
+                            <p class="text-sm text-green-800">{{ trend }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if articles %}
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">📚 Recommended Reading</h3>
+                    <div class="space-y-3">
+                        {% for article in articles %}
+                        <div class="p-3 bg-purple-50 rounded-lg">
+                            <h4 class="font-medium text-purple-900 text-sm">{{ article.title }}</h4>
+                            <p class="text-xs text-purple-600 mt-1">{{ article.summary }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">📋 Your Complete Interview Preparation Plan</h2>
+                    <div class="prose prose-lg max-w-none">
+                        <div class="whitespace-pre-wrap text-gray-700 leading-relaxed">{{ interview_plan }}</div>
+                    </div>
+
+                    <div class="mt-8 flex flex-wrap gap-4">
+                        <button onclick="window.print()"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2 rounded-lg transition duration-200">
+                            📄 Print Plan
+                        </button>
+                        <button onclick="copyToClipboard()"
+                                class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg transition duration-200">
+                            📋 Copy Plan
+                        </button>
+                        <a href="/"
+                           class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-2 rounded-lg transition duration-200">
+                            🏠 Create New Plan
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="bg-gray-800 text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h3 class="text-xl font-bold mb-4">Pathfinder AI</h3>
+                <p class="text-gray-400">Personalized learning paths for students and professionals.</p>
+                <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                    <p>&copy; 2025 Pathfinder AI. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function copyToClipboard() {
+            const planContent = document.querySelector('.prose').innerText;
+            navigator.clipboard.writeText(planContent).then(function() {
+                alert('Interview plan copied to clipboard!');
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+                alert('Copy failed. Please try selecting and copying manually.');
+            });
+        }
+    </script>
+</body>
+</html>

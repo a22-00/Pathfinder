@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Pathfinder Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 50%, #ede9fe 100%);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.9);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --border-color: rgba(139, 92, 246, 0.2);
+            --shadow-color: rgba(139, 92, 246, 0.1);
+            --input-focus: rgba(139, 92, 246, 0.8);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            --bg-card: rgba(26, 26, 46, 0.95);
+            --bg-input: rgba(15, 15, 35, 0.9);
+            --text-primary: #ffffff;
+            --text-secondary: #d1d5db;
+            --text-light: #9ca3af;
+            --border-color: rgba(0, 255, 157, 0.3);
+            --shadow-color: rgba(0, 255, 157, 0.1);
+            --input-focus: rgba(0, 255, 157, 0.8);
+        }
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: var(--bg-primary);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .input-glass {
+            background: var(--bg-input);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+        
+        .input-glass:focus {
+            background: var(--bg-card);
+            border-color: var(--input-focus);
+            box-shadow: 0 0 20px var(--shadow-color);
+            outline: none;
+        }
+        
+        .input-glass::placeholder {
+            color: var(--text-light);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-input);
+            transform: translateY(-2px);
+        }
+        
+        .alert {
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .alert-success {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+        
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center py-8">
+
+    <button id="themeToggle" class="theme-toggle">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+    
+    <div class="max-w-md w-full mx-4">
+
+        <div class="text-center mb-8 slide-up">
+            <div class="inline-block p-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 mb-6 floating-element">
+                <i class="fas fa-rocket text-4xl text-white"></i>
+            </div>
+            <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">
+                Join <span class="text-purple-600">Pathfinder Pro</span>
+            </h1>
+            <p style="color: var(--text-secondary);">
+                Start your AI-powered career journey today
+            </p>
+        </div>
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'error' if category == 'error' else category }} p-4 mb-4 slide-up">
+                        <div class="flex items-center">
+                            {% if category == 'error' %}
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                            {% elif category == 'success' %}
+                                <i class="fas fa-check-circle mr-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle mr-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+        <div class="glass-card p-8 slide-up" style="animation-delay: 0.2s;">
+            <form method="POST" id="register-form">
+                {{ form.hidden_tag() }}
+                
+                <div class="space-y-6">
+
+                    <div>
+                        {{ form.username.label(class="block font-medium mb-2", style="color: var(--text-primary);") }}
+                        {{ form.username(class="input-glass w-full px-4 py-3 rounded-xl focus:outline-none", placeholder="Choose a unique username") }}
+                        {% if form.username.errors %}
+                            <div class="mt-1 text-red-300 text-sm">
+                                {% for error in form.username.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+
+                    <div>
+                        {{ form.email.label(class="block font-medium mb-2", style="color: var(--text-primary);") }}
+                        {{ form.email(class="input-glass w-full px-4 py-3 rounded-xl focus:outline-none", placeholder="your.email@example.com") }}
+                        {% if form.email.errors %}
+                            <div class="mt-1 text-red-300 text-sm">
+                                {% for error in form.email.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            {{ form.first_name.label(class="block font-medium mb-2", style="color: var(--text-primary);") }}
+                            {{ form.first_name(class="input-glass w-full px-4 py-3 rounded-xl focus:outline-none", placeholder="First name") }}
+                        </div>
+                        <div>
+                            {{ form.last_name.label(class="block font-medium mb-2", style="color: var(--text-primary);") }}
+                            {{ form.last_name(class="input-glass w-full px-4 py-3 rounded-xl focus:outline-none", placeholder="Last name") }}
+                        </div>
+                    </div>
+
+
+                    <div>
+                        {{ form.password.label(class="block font-medium mb-2", style="color: var(--text-primary);") }}
+                        <div class="relative">
+                            {{ form.password(class="input-glass w-full px-4 py-3 rounded-xl focus:outline-none", placeholder="Create a strong password", id="password-field", onkeyup="checkPasswordStrength()") }}
+                            <button type="button" onclick="togglePassword('password-field', 'password-toggle')" class="absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors" style="color: var(--text-light);">
+                                <i class="fas fa-eye" id="password-toggle"></i>
+                            </button>
+                        </div>
+
+                        <div class="mt-2">
+                            <div class="password-strength w-full bg-gray-600" id="password-strength"></div>
+                            <p class="text-xs mt-1" id="password-strength-text" style="color: var(--text-light);">Enter a password to see strength</p>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="mt-1 text-red-300 text-sm">
+                                {% for error in form.password.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+
+                    <div>
+                        {{ form.password2.label(class="block font-medium mb-2", style="color: var(--text-primary);") }}
+                        <div class="relative">
+                            {{ form.password2(class="input-glass w-full px-4 py-3 rounded-xl focus:outline-none", placeholder="Confirm your password", id="password2-field") }}
+                            <button type="button" onclick="togglePassword('password2-field', 'password2-toggle')" class="absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors" style="color: var(--text-light);">
+                                <i class="fas fa-eye" id="password2-toggle"></i>
+                            </button>
+                        </div>
+                        {% if form.password2.errors %}
+                            <div class="mt-1 text-red-300 text-sm">
+                                {% for error in form.password2.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="text-sm" style="color: var(--text-secondary);">
+                        <p>By creating an account, you agree to our 
+                            <a href="#" class="text-purple-600 hover:text-purple-500 transition-colors">Terms of Service</a> 
+                            and 
+                            <a href="#" class="text-purple-600 hover:text-purple-500 transition-colors">Privacy Policy</a>
+                        </p>
+                    </div>
+
+
+                    <div>
+                        {{ form.submit(class="btn-primary w-full py-3 px-4 rounded-xl text-white font-semibold text-lg") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+        <div class="text-center mt-6 slide-up" style="animation-delay: 0.4s;">
+            <p style="color: var(--text-secondary);">
+                Already have an account?
+                <a href="{{ url_for('auth_login') }}" class="text-purple-600 hover:text-purple-500 font-semibold transition-colors">
+                    Sign in here
+                </a>
+            </p>
+        </div>
+
+
+        <div class="text-center mt-4 slide-up" style="animation-delay: 0.6s;">
+            <a href="{{ url_for('home') }}" class="btn-secondary inline-flex items-center px-6 py-2 rounded-xl text-sm font-medium">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(fieldId, toggleId) {
+            const passwordField = document.getElementById(fieldId);
+            const passwordToggle = document.getElementById(toggleId);
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordToggle.classList.remove('fa-eye');
+                passwordToggle.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                passwordToggle.classList.remove('fa-eye-slash');
+                passwordToggle.classList.add('fa-eye');
+            }
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password-field').value;
+            const strengthBar = document.getElementById('password-strength');
+            const strengthText = document.getElementById('password-strength-text');
+            
+            let strength = 0;
+            let feedback = '';
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/)) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+            
+            switch (strength) {
+                case 0:
+                case 1:
+                    strengthBar.style.background = '#ef4444';
+                    strengthBar.style.width = '20%';
+                    feedback = 'Very Weak';
+                    break;
+                case 2:
+                    strengthBar.style.background = '#f97316';
+                    strengthBar.style.width = '40%';
+                    feedback = 'Weak';
+                    break;
+                case 3:
+                    strengthBar.style.background = '#eab308';
+                    strengthBar.style.width = '60%';
+                    feedback = 'Fair';
+                    break;
+                case 4:
+                    strengthBar.style.background = '#22c55e';
+                    strengthBar.style.width = '80%';
+                    feedback = 'Good';
+                    break;
+                case 5:
+                    strengthBar.style.background = '#10b981';
+                    strengthBar.style.width = '100%';
+                    feedback = 'Excellent';
+                    break;
+            }
+            
+            strengthText.textContent = password.length > 0 ? `Password strength: ${feedback}` : 'Enter a password to see strength';
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const body = document.body;
+            
+
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            
+
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+            }
+            
+
+            themeToggle.addEventListener('click', function() {
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                
+                if (isDark) {
+                    body.removeAttribute('data-theme');
+                    themeIcon.className = 'fas fa-moon';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    body.setAttribute('data-theme', 'dark');
+                    themeIcon.className = 'fas fa-sun';
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+            
+
+            const elements = document.querySelectorAll('.slide-up');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.2}s`;
+            });
+        });
+    </script>
+</body>
+</html> 

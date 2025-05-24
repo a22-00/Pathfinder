@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assessment Suite | Pathfinder Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 50%, #ede9fe 100%);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-nav: rgba(255, 255, 255, 0.9);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --border-color: rgba(139, 92, 246, 0.2);
+            --shadow-color: rgba(139, 92, 246, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-focus: rgba(139, 92, 246, 0.8);
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            --bg-card: rgba(26, 26, 46, 0.95);
+            --bg-nav: rgba(15, 15, 35, 0.95);
+            --text-primary: #ffffff;
+            --text-secondary: #d1d5db;
+            --text-light: #9ca3af;
+            --border-color: rgba(0, 255, 157, 0.3);
+            --shadow-color: rgba(0, 255, 157, 0.1);
+            --input-bg: rgba(15, 15, 35, 0.9);
+            --input-focus: rgba(0, 255, 157, 0.8);
+        }
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: var(--bg-primary);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 20px rgba(79, 172, 254, 0.5); }
+            to { box-shadow: 0 0 30px rgba(79, 172, 254, 0.8); }
+        }
+        
+        .option-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: perspective(1000px) rotateX(0deg);
+        }
+        
+        .option-card:hover {
+            transform: perspective(1000px) rotateX(5deg) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .option-card.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.02);
+        }
+        
+        .option-card.correct {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .option-card.incorrect {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            transition: stroke-dashoffset 0.5s ease-in-out;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+        }
+        
+        .topic-input {
+            background: var(--input-bg);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+        
+        .topic-input:focus {
+            background: var(--bg-card);
+            border-color: var(--input-focus);
+            box-shadow: 0 0 20px var(--shadow-color);
+            outline: none;
+        }
+        
+        .topic-input::placeholder {
+            color: var(--text-light);
+        }
+        
+        .nav-glass {
+            background: var(--bg-nav);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .result-confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: confettiFall 3s linear forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .glass-dark {
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        
+        /* Professional Success Effects - Google-style */
+        .success-celebration-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        /* Elegant floating elements for programming topics */
+        .floating-symbol {
+            position: absolute;
+            color: #4285f4;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            animation: elegantFloat linear infinite;
+            opacity: 0.8;
+            text-shadow: 0 1px 3px rgba(66, 133, 244, 0.2);
+        }
+        
+        @keyframes elegantFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100px) translateX(20px) rotate(5deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Professional success badge */
+        .success-badge {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            padding: 24px 32px;
+            border-radius: 16px;
+            z-index: 1001;
+            animation: successBadgeEntry 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 32px rgba(66, 133, 244, 0.3);
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        @keyframes successBadgeEntry {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        /* Modern confetti for general topics */
+        .modern-confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            pointer-events: none;
+            animation: confettiGraceful 3s ease-out forwards;
+        }
+        
+        @keyframes confettiGraceful {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(180deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Google-style ripple effect */
+        .ripple-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        .ripple {
+            position: absolute;
+            border: 2px solid #4285f4;
+            border-radius: 50%;
+            animation: rippleExpand 2s ease-out forwards;
+            opacity: 0.6;
+        }
+        
+        @keyframes rippleExpand {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.6;
+            }
+            100% {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+            }
+        }
+        
+        /* Professional sparkles */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #4285f4;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkleFloat 2s ease-out forwards;
+        }
+        
+        @keyframes sparkleFloat {
+            0% {
+                opacity: 0;
+                transform: scale(0) translateY(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1) translateY(-30px);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5) translateY(-60px);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen overflow-x-hidden">
+    <!-- Hidden authentication status for JavaScript -->
+    <div data-user-authenticated="{% if user and user.is_authenticated %}true{% else %}false{% endif %}" style="display: none;"></div>
+    
+    <!-- Theme Toggle -->
+    <button id="themeToggle" class="theme-toggle">
+        <i id="themeIcon" class="fas fa-moon"></i>
+    </button>
+    
+
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="particle" style="top: 10%; left: 10%; width: 4px; height: 4px; animation-delay: 0s;"></div>
+        <div class="particle" style="top: 20%; left: 80%; width: 6px; height: 6px; animation-delay: 1s;"></div>
+        <div class="particle" style="top: 60%; left: 20%; width: 3px; height: 3px; animation-delay: 2s;"></div>
+        <div class="particle" style="top: 80%; left: 70%; width: 5px; height: 5px; animation-delay: 1.5s;"></div>
+        <div class="particle" style="top: 40%; left: 90%; width: 4px; height: 4px; animation-delay: 0.5s;"></div>
+    </div>
+
+
+    <nav class="nav-glass fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="text-2xl font-bold text-white">
+                        <i class="fas fa-brain mr-2"></i>
+                        Pathfinder <span class="text-blue-300">Pro</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="/" class="text-white hover:text-blue-300 transition-colors">
+                        <i class="fas fa-home mr-1"></i> Home
+                    </a>
+                    <a href="/job-seeker" class="text-white hover:text-blue-300 transition-colors">
+                        <i class="fas fa-comments mr-1"></i> AI Chat
+                    </a>
+                    <div class="text-white">
+                        <i class="fas fa-graduation-cap mr-1"></i> Assessment Suite
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="relative z-10 pt-20 pb-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Topic Input Section -->
+            <div id="topic-section" class="glass-card p-8 mb-8 slide-up floating-element">
+            <div class="text-center mb-8">
+                    <div class="inline-block p-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 mb-6">
+                        <i class="fas fa-rocket text-4xl text-white"></i>
+                    </div>
+                    <h1 class="text-4xl font-bold text-white mb-4">
+                        AI-Powered Skills Assessment
+                    </h1>
+                    <p class="text-xl text-gray-100 max-w-2xl mx-auto">
+                        Experience next-generation learning with our intelligent assessment system. 
+                        Get personalized questions and instant feedback powered by advanced AI.
+                    </p>
+            </div>
+            
+            <div class="max-w-md mx-auto">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="topic-input" class="block text-lg font-medium text-white mb-3">
+                                <i class="fas fa-lightbulb mr-2"></i>
+                                What would you like to master today?
+                </label>
+                <input 
+                    type="text" 
+                    id="topic-input" 
+                                placeholder="e.g., Machine Learning, React.js, Data Science..."
+                                class="topic-input w-full px-6 py-4 rounded-2xl text-white placeholder-gray-300 focus:outline-none text-lg"
+                >
+                        </div>
+                <button 
+                    id="start-btn" 
+                            class="btn-primary w-full py-4 px-8 rounded-2xl text-white font-semibold text-lg pulse-glow"
+                >
+                            <i class="fas fa-play mr-2"></i>
+                            Launch Assessment
+                </button>
+                    </div>
+            </div>
+        </div>
+
+        <!-- Loading Section -->
+            <div id="loading-section" class="hidden glass-card p-12 text-center slide-up">
+                <div class="loading-spinner mx-auto mb-6"></div>
+                <h2 class="text-2xl font-semibold text-white mb-4">
+                    <i class="fas fa-magic mr-2"></i>
+                    Creating Your Personalized Assessment
+                </h2>
+                <p class="text-gray-100 text-lg">
+                    Our AI is crafting 25 intelligent questions tailored just for you...
+                </p>
+                <div class="mt-6 flex justify-center space-x-2">
+                    <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                    <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style="animation-delay: 0.2s;"></div>
+                    <div class="w-2 h-2 bg-pink-400 rounded-full animate-pulse" style="animation-delay: 0.4s;"></div>
+                </div>
+        </div>
+
+        <!-- Assessment Section -->
+            <div id="assessment-section" class="hidden space-y-6">
+                <!-- Progress Dashboard -->
+                <div class="glass-card p-6 slide-up">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-6">
+                            <!-- Circular Progress -->
+                            <div class="relative w-20 h-20">
+                                <svg class="progress-ring w-20 h-20">
+                                    <circle
+                                        class="progress-ring-circle stroke-current text-blue-400"
+                                        stroke-width="3"
+                                        fill="transparent"
+                                        r="40"
+                                        cx="40"
+                                        cy="40"
+                                    />
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span id="progress-number" class="text-white font-bold text-lg">1</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 id="progress-text" class="text-white text-xl font-semibold">Question 1 of 25</h3>
+                                <p class="text-gray-300">Keep going! You're doing great!</p>
+                            </div>
+                        </div>
+                        
+                        <div class="text-right">
+                            <div class="text-3xl font-bold text-white" id="score-counter">0</div>
+                            <div class="text-gray-300">Correct Answers</div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+                <div class="glass-card p-8 slide-up">
+                    <div class="mb-8">
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                                <span id="question-number-icon" class="text-white text-sm font-bold">1</span>
+                            </div>
+                            <span class="text-gray-300 font-medium">Current Question</span>
+                        </div>
+                        <h2 id="question-text" class="text-2xl font-semibold text-white leading-relaxed">
+                        <!-- Question will be inserted here -->
+                    </h2>
+                </div>
+
+                    <div id="options-container" class="space-y-4 mb-8">
+                    <!-- Options will be inserted here -->
+                </div>
+
+                    <div id="feedback-section" class="hidden mb-8 p-6 rounded-2xl glass-dark">
+                        <div class="flex items-center mb-3">
+                            <i id="feedback-icon" class="fas fa-check-circle text-2xl mr-3"></i>
+                            <h4 id="feedback-text" class="text-xl font-semibold"></h4>
+                        </div>
+                        <p id="explanation-text" class="text-gray-300 leading-relaxed"></p>
+                </div>
+
+                    <div class="flex justify-between items-center">
+                        <button id="prev-btn" class="hidden px-6 py-3 rounded-xl bg-gray-600 text-white hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i>Previous
+                    </button>
+                        <div class="flex space-x-4 ml-auto">
+                            <button id="submit-btn" class="btn-primary px-8 py-3 rounded-xl text-white font-semibold disabled:opacity-50" disabled>
+                                <i class="fas fa-paper-plane mr-2"></i>Submit Answer
+                    </button>
+                            <button id="next-btn" class="hidden btn-primary px-8 py-3 rounded-xl text-white font-semibold">
+                                Next Question<i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+            <div id="results-section" class="hidden space-y-8">
+                <!-- Confetti Effect -->
+                <div id="confetti-container" class="fixed inset-0 pointer-events-none z-40"></div>
+                
+                <!-- Score Card -->
+                <div class="glass-card p-12 text-center slide-up">
+                    <div class="inline-block p-6 rounded-full bg-gradient-to-r from-green-400 to-blue-500 mb-6">
+                        <i class="fas fa-trophy text-6xl text-white"></i>
+                    </div>
+                    <h2 class="text-4xl font-bold text-white mb-4">Assessment Complete!</h2>
+                    <div class="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 mb-4" id="score-display">
+                    <!-- Score will be inserted here -->
+                </div>
+                    <p class="text-2xl text-gray-100 mb-8" id="score-text">
+                    <!-- Score text will be inserted here -->
+                </p>
+                    
+                    <!-- Performance Metrics -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                        <div class="glass-dark p-6 rounded-2xl">
+                            <div class="text-3xl font-bold text-green-400" id="correct-count">0</div>
+                            <div class="text-gray-300">Correct</div>
+                        </div>
+                        <div class="glass-dark p-6 rounded-2xl">
+                            <div class="text-3xl font-bold text-red-400" id="incorrect-count">0</div>
+                            <div class="text-gray-300">Incorrect</div>
+                        </div>
+                        <div class="glass-dark p-6 rounded-2xl">
+                            <div class="text-3xl font-bold text-blue-400" id="accuracy-percent">0%</div>
+                            <div class="text-gray-300">Accuracy</div>
+                        </div>
+                    </div>
+            </div>
+
+            <!-- Learning Plan -->
+                <div class="glass-card p-8 slide-up">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-graduation-cap text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold text-white">Your Personalized Learning Journey</h3>
+                    </div>
+                    <div id="learning-plan-content" class="prose prose-invert max-w-none text-gray-100">
+                    <!-- Learning plan will be inserted here -->
+                </div>
+                
+                    <div class="mt-8 flex flex-wrap justify-center gap-4">
+                        <button id="restart-btn" class="btn-primary px-8 py-4 rounded-2xl text-white font-semibold">
+                            <i class="fas fa-redo mr-2"></i>Take New Assessment
+                        </button>
+                        <button id="download-plan-btn" class="bg-gray-600 hover:bg-gray-700 px-8 py-4 rounded-2xl text-white font-semibold transition-colors">
+                            <i class="fas fa-download mr-2"></i>Download Plan
+                    </button>
+                        <button id="share-btn" class="bg-green-600 hover:bg-green-700 px-8 py-4 rounded-2xl text-white font-semibold transition-colors">
+                            <i class="fas fa-share mr-2"></i>Share Results
+                    </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AssessmentApp {
+            constructor() {
+                this.sessionId = null;
+                this.currentQuestion = null;
+                this.selectedAnswer = null;
+                this.totalQuestions = 25;
+                this.currentQuestionNumber = 1;
+                this.score = 0;
+                this.assessmentTopic = null; // Store topic for celebration effects
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.addInteractiveEffects();
+            }
+            
+            initializeElements() {
+                // Topic section
+                this.topicSection = document.getElementById('topic-section');
+                this.topicInput = document.getElementById('topic-input');
+                this.startBtn = document.getElementById('start-btn');
+                
+                // Loading section
+                this.loadingSection = document.getElementById('loading-section');
+                
+                // Assessment section
+                this.assessmentSection = document.getElementById('assessment-section');
+                this.questionText = document.getElementById('question-text');
+                this.optionsContainer = document.getElementById('options-container');
+                this.submitBtn = document.getElementById('submit-btn');
+                this.nextBtn = document.getElementById('next-btn');
+                this.progressNumber = document.getElementById('progress-number');
+                this.progressText = document.getElementById('progress-text');
+                this.scoreCounter = document.getElementById('score-counter');
+                this.questionNumberIcon = document.getElementById('question-number-icon');
+                
+                // Feedback section
+                this.feedbackSection = document.getElementById('feedback-section');
+                this.feedbackIcon = document.getElementById('feedback-icon');
+                this.feedbackText = document.getElementById('feedback-text');
+                this.explanationText = document.getElementById('explanation-text');
+                
+                // Results section
+                this.resultsSection = document.getElementById('results-section');
+                this.scoreDisplay = document.getElementById('score-display');
+                this.scoreText = document.getElementById('score-text');
+                this.correctCount = document.getElementById('correct-count');
+                this.incorrectCount = document.getElementById('incorrect-count');
+                this.accuracyPercent = document.getElementById('accuracy-percent');
+                this.learningPlanContent = document.getElementById('learning-plan-content');
+                this.restartBtn = document.getElementById('restart-btn');
+                this.downloadPlanBtn = document.getElementById('download-plan-btn');
+                this.shareBtn = document.getElementById('share-btn');
+                
+                this.animatePlaceholder();
+            }
+            
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => this.startAssessment());
+                this.topicInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.startAssessment();
+                });
+                this.submitBtn.addEventListener('click', () => this.submitAnswer());
+                this.nextBtn.addEventListener('click', () => this.nextQuestion());
+                this.restartBtn.addEventListener('click', () => this.restart());
+                this.downloadPlanBtn.addEventListener('click', () => this.downloadPlan());
+                this.shareBtn.addEventListener('click', () => this.shareResults());
+            }
+            
+            addInteractiveEffects() {
+                // Add typing effect to placeholder
+                this.animatePlaceholder();
+                
+                // Add floating animation delays
+                document.querySelectorAll('.floating-element').forEach((el, index) => {
+                    el.style.animationDelay = `${index * 0.5}s`;
+                });
+            }
+            
+            animatePlaceholder() {
+                const placeholders = [
+                    "e.g., Machine Learning, React.js, Data Science...",
+                    "e.g., Python Programming, JavaScript, AI...",
+                    "e.g., Digital Marketing, UX Design, Finance...",
+                    "e.g., Cloud Computing, Cybersecurity, DevOps..."
+                ];
+                let currentIndex = 0;
+                
+                setInterval(() => {
+                    this.topicInput.placeholder = placeholders[currentIndex];
+                    currentIndex = (currentIndex + 1) % placeholders.length;
+                }, 3000);
+            }
+            
+            async startAssessment() {
+                const topic = this.topicInput.value.trim();
+                if (!topic) {
+                    this.showNotification('Please enter a topic', 'error');
+                    return;
+                }
+                
+                this.assessmentTopic = topic; // Store topic for celebration effects
+                this.showLoading();
+                
+                try {
+                    const response = await fetch('/start-assessment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ topic })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        this.showNotification(data.error, 'error');
+                        this.showTopicInput();
+                        return;
+                    }
+                    
+                    this.sessionId = data.session_id;
+                    this.totalQuestions = data.total_questions;
+                    this.currentQuestion = data.first_question;
+                    this.currentQuestionNumber = 1;
+                    this.score = 0;
+                    
+                    setTimeout(() => {
+                    this.showAssessment();
+                    this.displayQuestion();
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('Error starting assessment:', error);
+                    this.showNotification('Failed to start assessment. Please try again.', 'error');
+                    this.showTopicInput();
+                }
+            }
+            
+            displayQuestion() {
+                if (!this.currentQuestion) return;
+                
+                this.questionText.textContent = this.currentQuestion.question;
+                this.optionsContainer.innerHTML = '';
+                this.selectedAnswer = null;
+                this.submitBtn.disabled = true;
+                this.hideFeedback();
+                
+                // Create option buttons with enhanced styling
+                Object.entries(this.currentQuestion.options).forEach(([letter, text]) => {
+                    const optionCard = document.createElement('div');
+                    optionCard.className = 'option-card glass-dark p-6 rounded-2xl cursor-pointer border border-gray-600 hover:border-blue-400';
+                    optionCard.innerHTML = `
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                ${letter}
+                            </div>
+                            <div class="flex-1 text-white text-lg leading-relaxed">${text}</div>
+                        </div>
+                    `;
+                    optionCard.addEventListener('click', () => this.selectOption(letter, optionCard));
+                    this.optionsContainer.appendChild(optionCard);
+                });
+                
+                this.updateProgress();
+                this.animateElements();
+            }
+            
+            selectOption(letter, optionCard) {
+                // Remove previous selection
+                document.querySelectorAll('.option-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // Select current option
+                optionCard.classList.add('selected');
+                this.selectedAnswer = letter;
+                this.submitBtn.disabled = false;
+                
+                // Add selection animation
+                optionCard.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    optionCard.style.transform = '';
+                }, 200);
+            }
+            
+            async submitAnswer() {
+                if (!this.selectedAnswer) return;
+                
+                this.submitBtn.disabled = true;
+                this.submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...';
+                
+                try {
+                    const response = await fetch('/submit-answer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            session_id: this.sessionId,
+                            answer: this.selectedAnswer
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        // Handle session errors specifically
+                        if (data.error.includes('session not found') || data.error.includes('Invalid session')) {
+                            this.handleSessionError(data.error);
+                            return;
+                        }
+                        this.showNotification(data.error, 'error');
+                        return;
+                    }
+                    
+                    if (data.correct) {
+                        this.score++;
+                        this.scoreCounter.textContent = this.score;
+                    }
+                    
+                    this.showFeedback(data);
+                    
+                    if (data.completed) {
+                        setTimeout(() => {
+                            this.showResults(data);
+                        }, 2000);
+                    } else {
+                        this.currentQuestion = data.next_question;
+                        this.currentQuestionNumber = data.question_number;
+                        this.nextBtn.classList.remove('hidden');
+                        this.submitBtn.classList.add('hidden');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error submitting answer:', error);
+                    this.showNotification('Failed to submit answer. Please try again.', 'error');
+                } finally {
+                    this.submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit Answer';
+                    this.submitBtn.disabled = false;
+                }
+            }
+            
+            handleSessionError(errorMessage) {
+                console.error('Session error:', errorMessage);
+                
+                // Show user-friendly error with recovery option
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-red-600 text-white p-6 rounded-2xl max-w-md text-center shadow-2xl';
+                notification.innerHTML = `
+                    <div class="mb-4">
+                        <i class="fas fa-exclamation-triangle text-4xl mb-2"></i>
+                        <h3 class="text-lg font-bold">Session Lost</h3>
+                        <p class="text-sm mt-2">Your assessment session has expired or been lost. This can happen due to server restarts or network issues.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <button onclick="this.parentElement.parentElement.remove(); window.assessmentApp.restart();" 
+                                class="bg-white text-red-600 px-4 py-2 rounded-lg font-semibold w-full hover:bg-gray-100">
+                            <i class="fas fa-redo mr-2"></i>Start New Assessment
+                        </button>
+                        <button onclick="this.parentElement.parentElement.remove();" 
+                                class="bg-red-700 text-white px-4 py-2 rounded-lg font-semibold w-full hover:bg-red-800">
+                            <i class="fas fa-times mr-2"></i>Close
+                        </button>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Auto-remove after 10 seconds
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 10000);
+            }
+            
+            showFeedback(data) {
+                const optionCards = document.querySelectorAll('.option-card');
+                
+                // Add null checks for data properties
+                if (!data || !data.correct_answer) {
+                    console.error('Invalid feedback data:', data);
+                    this.showNotification('Error displaying feedback. Please try again.', 'error');
+                    return;
+                }
+                
+                optionCards.forEach(card => {
+                    const letterElement = card.querySelector('div > div');
+                    if (!letterElement) return;
+                    
+                    const letter = letterElement.textContent.trim();
+                    if (letter === data.correct_answer) {
+                        card.classList.add('correct');
+                        card.innerHTML += '<div class="absolute top-2 right-2"><i class="fas fa-check-circle text-2xl text-white"></i></div>';
+                    } else if (letter === this.selectedAnswer && !data.correct) {
+                        card.classList.add('incorrect');
+                        card.innerHTML += '<div class="absolute top-2 right-2"><i class="fas fa-times-circle text-2xl text-white"></i></div>';
+                    }
+                    card.style.position = 'relative';
+                });
+                
+                if (data.correct) {
+                    this.feedbackIcon.className = 'fas fa-check-circle text-2xl mr-3 text-green-400';
+                    this.feedbackText.textContent = 'Excellent! Correct Answer!';
+                    this.feedbackText.className = 'text-xl font-semibold text-green-400';
+                    this.feedbackSection.style.background = 'rgba(34, 197, 94, 0.2)';
+                } else {
+                    this.feedbackIcon.className = 'fas fa-times-circle text-2xl mr-3 text-red-400';
+                    this.feedbackText.textContent = 'Not quite right, but great try!';
+                    this.feedbackText.className = 'text-xl font-semibold text-red-400';
+                    this.feedbackSection.style.background = 'rgba(239, 68, 68, 0.2)';
+                }
+                
+                // Find the correct answer text from current question options with null checks
+                if (this.currentQuestion && this.currentQuestion.options && data.correct_answer) {
+                    const correctAnswerText = this.currentQuestion.options[data.correct_answer];
+                    if (correctAnswerText) {
+                        this.explanationText.textContent = `Correct answer: ${data.correct_answer}) ${correctAnswerText}`;
+                    } else {
+                        this.explanationText.textContent = `Correct answer: ${data.correct_answer}`;
+                    }
+                } else {
+                    this.explanationText.textContent = 'Answer feedback is loading...';
+                }
+                
+                this.feedbackSection.classList.remove('hidden');
+                
+                // Add feedback animation
+                this.feedbackSection.style.transform = 'translateY(-10px)';
+                this.feedbackSection.style.opacity = '0';
+                setTimeout(() => {
+                    this.feedbackSection.style.transform = 'translateY(0)';
+                    this.feedbackSection.style.opacity = '1';
+                }, 100);
+            }
+            
+            hideFeedback() {
+                this.feedbackSection.classList.add('hidden');
+            }
+            
+            nextQuestion() {
+                this.nextBtn.classList.add('hidden');
+                this.submitBtn.classList.remove('hidden');
+                this.submitBtn.disabled = true;
+                this.displayQuestion();
+            }
+            
+            updateProgress() {
+                const percentage = (this.currentQuestionNumber / this.totalQuestions) * 100;
+                const circle = document.querySelector('.progress-ring-circle');
+                const circumference = 2 * Math.PI * 40;
+                const offset = circumference - (percentage / 100) * circumference;
+                
+                circle.style.strokeDashoffset = offset;
+                this.progressNumber.textContent = this.currentQuestionNumber;
+                this.progressText.textContent = `Question ${this.currentQuestionNumber} of ${this.totalQuestions}`;
+                
+                // Update the question number icon
+                if (this.questionNumberIcon) {
+                    this.questionNumberIcon.textContent = this.currentQuestionNumber;
+                }
+            }
+            
+            animateElements() {
+                // Add staggered animation to options
+                const options = document.querySelectorAll('.option-card');
+                options.forEach((option, index) => {
+                    option.style.opacity = '0';
+                    option.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        option.style.transition = 'all 0.5s ease';
+                        option.style.opacity = '1';
+                        option.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }
+            
+            showResults(data) {
+                this.assessmentSection.classList.add('hidden');
+                this.resultsSection.classList.remove('hidden');
+                
+                const percentage = Math.round(data.percentage);
+                this.scoreDisplay.textContent = `${data.score}/${data.total_questions}`;
+                this.scoreText.textContent = `You achieved ${percentage}% accuracy!`;
+                
+                this.correctCount.textContent = data.score;
+                this.incorrectCount.textContent = data.total_questions - data.score;
+                this.accuracyPercent.textContent = `${percentage}%`;
+                
+                // Format learning plan with better styling
+                const formattedPlan = data.learning_plan
+                    .replace(/##\s*(.*)/g, '<h3 class="text-2xl font-bold text-blue-400 mt-6 mb-4 flex items-center"><i class="fas fa-star mr-2"></i>$1</h3>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
+                    .replace(/\n/g, '<br>');
+                
+                this.learningPlanContent.innerHTML = formattedPlan;
+                
+                // Trigger appropriate celebration effect based on topic
+                setTimeout(() => {
+                    if (this.assessmentTopic && this.isCodingTopic(this.assessmentTopic)) {
+                        console.log('🔥 Triggering code rain effect for programming topic:', this.assessmentTopic);
+                        this.createProfessionalCodingCelebration();
+                    } else {
+                        console.log('🎆 Triggering fireworks effect for general topic:', this.assessmentTopic);
+                        this.createModernConfettiCelebration();
+                    }
+                }, 500);
+                
+                // Add dashboard options for authenticated users
+                this.addDashboardOptions();
+            }
+            
+            addDashboardOptions() {
+                // Check if user is authenticated
+                const userAuthElement = document.querySelector('[data-user-authenticated]');
+                const isAuthenticated = userAuthElement && userAuthElement.dataset.userAuthenticated === 'true';
+                
+                if (isAuthenticated) {
+                    // Show completion notification without countdown
+                    const notificationDiv = document.createElement('div');
+                    notificationDiv.className = 'fixed top-4 right-4 z-50 bg-green-600 text-white p-4 rounded-2xl shadow-2xl max-w-sm';
+                    notificationDiv.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-2xl"></i>
+                            <div>
+                                <div class="font-bold">Assessment Complete! 🎉</div>
+                                <div class="text-sm">Take your time to review your results</div>
+                            </div>
+                            <button onclick="this.parentElement.parentElement.remove();" 
+                                    class="ml-2 text-white hover:text-gray-200">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(notificationDiv);
+                    
+                    // Auto-remove notification after 8 seconds (but no redirect)
+                    setTimeout(() => {
+                        if (notificationDiv.parentElement) {
+                            notificationDiv.remove();
+                        }
+                    }, 8000);
+                    
+                    // Add prominent "View Dashboard" button to results section
+                    const dashboardBtn = document.createElement('button');
+                    dashboardBtn.className = 'bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-2xl text-white font-semibold transition-colors transform hover:scale-105';
+                    dashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt mr-2"></i>View Dashboard & See All Results';
+                    dashboardBtn.onclick = () => {
+                        window.location.href = '/dashboard?assessment_completed=true';
+                    };
+                    
+                    // Insert the button prominently in the results
+                    const buttonContainer = document.querySelector('#results-section .mt-8');
+                    if (buttonContainer) {
+                        // Create a separate container for the dashboard button to make it more prominent
+                        const dashboardContainer = document.createElement('div');
+                        dashboardContainer.className = 'mt-6 p-4 bg-blue-900 bg-opacity-30 rounded-2xl border border-blue-400 border-opacity-30';
+                        dashboardContainer.innerHTML = `
+                            <div class="text-center">
+                                <p class="text-blue-200 text-sm mb-3">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Your results have been saved to your dashboard
+                                </p>
+                            </div>
+                        `;
+                        dashboardContainer.appendChild(dashboardBtn);
+                        
+                        // Insert before the existing buttons
+                        buttonContainer.parentNode.insertBefore(dashboardContainer, buttonContainer);
+                    }
+                    
+                    // Also add a smaller link at the top of results for quick access
+                    const quickLinkDiv = document.createElement('div');
+                    quickLinkDiv.className = 'text-center mb-4';
+                    quickLinkDiv.innerHTML = `
+                        <a href="/dashboard?assessment_completed=true" 
+                           class="inline-flex items-center text-blue-300 hover:text-blue-200 text-sm transition-colors">
+                            <i class="fas fa-external-link-alt mr-1"></i>
+                            Go to Dashboard
+                        </a>
+                    `;
+                    
+                    // Insert at the top of results section
+                    const resultsSection = document.getElementById('results-section');
+                    const firstCard = resultsSection.querySelector('.glass-card');
+                    if (firstCard) {
+                        firstCard.insertBefore(quickLinkDiv, firstCard.firstChild);
+                    }
+                }
+            }
+            
+            createConfetti() {
+                const container = document.getElementById('confetti-container');
+                const colors = ['#f39c12', '#e74c3c', '#9b59b6', '#3498db', '#2ecc71'];
+                
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'result-confetti';
+                        confetti.style.left = Math.random() * 100 + '%';
+                        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.animationDelay = Math.random() * 3 + 's';
+                        container.appendChild(confetti);
+                        
+                        setTimeout(() => confetti.remove(), 3000);
+                    }, i * 100);
+                }
+            }
+            
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-20 right-4 z-50 p-4 rounded-2xl glass-card text-white font-semibold transform translate-x-full transition-transform duration-300`;
+                
+                if (type === 'error') {
+                    notification.innerHTML = `<i class="fas fa-exclamation-triangle mr-2 text-red-400"></i>${message}`;
+                } else {
+                    notification.innerHTML = `<i class="fas fa-info-circle mr-2 text-blue-400"></i>${message}`;
+                }
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(full)';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+            
+            showTopicInput() {
+                this.topicSection.classList.remove('hidden');
+                this.loadingSection.classList.add('hidden');
+                this.assessmentSection.classList.add('hidden');
+                this.resultsSection.classList.add('hidden');
+            }
+            
+            showLoading() {
+                this.topicSection.classList.add('hidden');
+                this.loadingSection.classList.remove('hidden');
+                this.assessmentSection.classList.add('hidden');
+                this.resultsSection.classList.add('hidden');
+            }
+            
+            showAssessment() {
+                this.topicSection.classList.add('hidden');
+                this.loadingSection.classList.add('hidden');
+                this.assessmentSection.classList.remove('hidden');
+                this.resultsSection.classList.add('hidden');
+            }
+            
+            restart() {
+                this.sessionId = null;
+                this.currentQuestion = null;
+                this.selectedAnswer = null;
+                this.currentQuestionNumber = 1;
+                this.score = 0;
+                this.assessmentTopic = null; // Clear topic
+                this.topicInput.value = '';
+                this.scoreCounter.textContent = '0';
+                this.showTopicInput();
+            }
+            
+            downloadPlan() {
+                const planText = this.learningPlanContent.textContent;
+                const blob = new Blob([planText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'learning-plan.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showNotification('Learning plan downloaded successfully!', 'info');
+            }
+            
+            shareResults() {
+                const shareData = {
+                    title: 'Pathfinder Pro Assessment Results',
+                    text: `I just completed an AI assessment and scored ${this.scoreDisplay.textContent}!`,
+                    url: window.location.href
+                };
+                
+                if (navigator.share) {
+                    navigator.share(shareData);
+                } else {
+                    navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+                    this.showNotification('Results copied to clipboard!', 'info');
+                }
+            }
+            
+            // Check if topic is coding/programming related
+            isCodingTopic(topic) {
+                const codingKeywords = [
+                    'programming', 'coding', 'javascript', 'python', 'java', 'c++', 'c#', 'php', 'ruby', 'go', 'rust',
+                    'html', 'css', 'react', 'angular', 'vue', 'node', 'backend', 'frontend', 'fullstack', 'full-stack',
+                    'algorithm', 'data structure', 'computer science', 'software', 'development', 'web development',
+                    'mobile development', 'app development', 'database', 'sql', 'nosql', 'mongodb', 'mysql', 'postgresql',
+                    'git', 'github', 'devops', 'docker', 'kubernetes', 'aws', 'azure', 'cloud', 'api', 'rest', 'graphql',
+                    'machine learning', 'ai', 'artificial intelligence', 'deep learning', 'neural network', 'tensorflow',
+                    'cybersecurity', 'security', 'hacking', 'penetration testing', 'blockchain', 'cryptocurrency',
+                    'linux', 'unix', 'shell', 'bash', 'terminal', 'command line', 'cli', 'framework', 'library',
+                    'testing', 'unit test', 'integration test', 'selenium', 'jest', 'cypress', 'debugging'
+                ];
+                
+                const topicLower = topic.toLowerCase();
+                return codingKeywords.some(keyword => topicLower.includes(keyword));
+            }
+            
+            // Create professional celebration for programming topics
+            createProfessionalCodingCelebration() {
+                const container = document.createElement('div');
+                container.className = 'success-celebration-container';
+                document.body.appendChild(container);
+                
+                // Professional programming symbols
+                const symbols = [
+                    '{ }', '[ ]', '< >', '( )', '=>', '===', 'class', 'function', 'const', 'let',
+                    'import', 'export', 'async', 'await', 'return', 'if', 'else', 'for', 'while'
+                ];
+                
+                // Create elegant floating symbols
+                for (let i = 0; i < 12; i++) {
+                    setTimeout(() => {
+                        const symbol = document.createElement('div');
+                        symbol.className = 'floating-symbol';
+                        symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                        symbol.style.left = Math.random() * window.innerWidth + 'px';
+                        symbol.style.animationDuration = (4 + Math.random() * 2) + 's';
+                        symbol.style.animationDelay = Math.random() * 2 + 's';
+                        
+                        container.appendChild(symbol);
+                        
+                        setTimeout(() => {
+                            if (symbol.parentNode) {
+                                symbol.remove();
+                            }
+                        }, 6000);
+                    }, i * 200);
+                }
+                
+                // Add ripple effects
+                this.createRippleEffects();
+                
+                // Show professional success badge
+                setTimeout(() => {
+                    this.showProfessionalSuccessBadge();
+                }, 500);
+                
+                // Clean up after 6 seconds
+                setTimeout(() => {
+                    container.remove();
+                }, 6000);
+            }
+            
+            // Create modern confetti celebration for general topics
+            createModernConfettiCelebration() {
+                const container = document.getElementById('confetti-container');
+                const colors = ['#4285f4', '#34a853', '#fbbc04', '#ea4335', '#9aa0a6'];
+                
+                // Show success badge
+                this.showProfessionalSuccessBadge();
+                
+                // Create Google-style confetti
+                for (let i = 0; i < 60; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'modern-confetti';
+                        confetti.style.left = Math.random() * window.innerWidth + 'px';
+                        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.animationDelay = Math.random() * 2 + 's';
+                        confetti.style.animationDuration = (2 + Math.random()) + 's';
+                        
+                        container.appendChild(confetti);
+                        
+                        setTimeout(() => confetti.remove(), 4000);
+                    }, i * 50);
+                }
+                
+                // Add sparkles around the screen
+                this.createProfessionalSparkles(container);
+                
+                // Add ripple effects
+                this.createRippleEffects();
+            }
+            
+            createRippleEffects() {
+                const rippleContainer = document.createElement('div');
+                rippleContainer.className = 'ripple-container';
+                document.body.appendChild(rippleContainer);
+                
+                // Create multiple ripples from different points
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const ripple = document.createElement('div');
+                        ripple.className = 'ripple';
+                        ripple.style.left = (Math.random() * window.innerWidth) + 'px';
+                        ripple.style.top = (Math.random() * window.innerHeight) + 'px';
+                        ripple.style.marginLeft = '-150px';
+                        ripple.style.marginTop = '-150px';
+                        
+                        rippleContainer.appendChild(ripple);
+                        
+                        setTimeout(() => ripple.remove(), 2000);
+                    }, i * 400);
+                }
+                
+                setTimeout(() => rippleContainer.remove(), 3000);
+            }
+            
+            createProfessionalSparkles(container) {
+                for (let i = 0; i < 30; i++) {
+                    setTimeout(() => {
+                        const sparkle = document.createElement('div');
+                        sparkle.className = 'sparkle';
+                        sparkle.style.left = Math.random() * window.innerWidth + 'px';
+                        sparkle.style.top = (window.innerHeight * 0.2 + Math.random() * window.innerHeight * 0.6) + 'px';
+                        
+                        container.appendChild(sparkle);
+                        
+                        setTimeout(() => sparkle.remove(), 2000);
+                    }, i * 100);
+                }
+            }
+            
+            showProfessionalSuccessBadge() {
+                const badge = document.createElement('div');
+                badge.className = 'success-badge';
+                badge.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                        <svg style="width: 24px; height: 24px; margin-right: 8px;" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        Assessment Complete!
+                    </div>
+                    <div style="font-size: 14px; margin-top: 4px; opacity: 0.9;">
+                        Score: ${this.score}/${this.totalQuestions}
+                    </div>
+                `;
+                
+                document.body.appendChild(badge);
+                
+                setTimeout(() => {
+                    badge.remove();
+                }, 4000);
+            }
+        }
+        
+        // Theme toggle functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const assessmentApp = new AssessmentApp();
+            window.assessmentApp = assessmentApp; // Make globally accessible for error recovery
+            
+            // Check for topic parameter in URL and pre-fill
+            const urlParams = new URLSearchParams(window.location.search);
+            const topic = urlParams.get('topic');
+            if (topic) {
+                assessmentApp.topicInput.value = decodeURIComponent(topic);
+            }
+            
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const body = document.body;
+            
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                const isDark = body.getAttribute('data-theme') === 'dark';
+                
+                if (isDark) {
+                    body.removeAttribute('data-theme');
+                    themeIcon.className = 'fas fa-moon';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    body.setAttribute('data-theme', 'dark');
+                    themeIcon.className = 'fas fa-sun';
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
